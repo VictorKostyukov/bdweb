@@ -3,15 +3,20 @@
 const Api = require("../common/Api.js").Api;
 
 
-class TestApi extends Api {
+class SystemTestApi extends Api {
   constructor(obj) {
     super(obj);
   }
 
-  Test(test1, test2) {
+  async Test({test1, test2}) {
     return {
       test1: test1,
       test2: test2
     };
   }
 }
+
+
+module.exports = {
+  Api : SystemTestApi
+};

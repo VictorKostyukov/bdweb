@@ -1,47 +1,49 @@
 #! /usr/bin/env node
 
-const _exception = require("Exception.js");
+const _exception = require("./Exception.js");
 const InvalidArgumentException = _exception.InvalidArgumentException;
-const NotSupportedException = _exception.NotSupportedException;
 const ObjectNotFoundException = _exception.ObjectNotFoundException;
 const AlreadyExistException = _exception.AlreadyExistException;
-const InvalidOperationException = _exception.InvalidOperationException;
 const DbException = _exception.DbException;
 
-const db = require("DbConnection.js").DbConnection.db;
+const db = require("./DbConnection.js").connection.db;
+
+
+const __handleDbResult = function(err, result, resolve, reject) {
+  if (err) {
+    reject(new DbException(err));
+  } else {
+    resolve(result);
+  }
+};
 
 
 class ObjectBase {
-  constructor(type, path, onload) {
-    this.type = type;
-    this.path = path;
+  constructor(type, path) {
+    this._type = type;
+    this._path = path;
+  }
 
-    this.__load(onload);
+  async init() {
+    return this;
   }
 
   get type() {
-    return this.type;
+    return this._type;
   }
 
   get path() {
-    return this.path;
+    return this._path;
   }
 
-  __load(oncomplete) {
-    if (oncomplete) {
-      oncomplete(this);
-    }
-  }
-
-
-  static create(path, onload) {
+  static create(path) {
     if (path.startsWith("system://")) {
-      return new SystemObject(path, onload);
+      return new SystemObject(path);
     } else if (path.startsWith("name://")) {
       if (path.indexOf("/", "name://".length) >= 0) {
-        return new DbObject(path, onload);
+        return new DbObject(path);
       } else {
-        return new DbCollectionObject(path, onload);
+        return new DbCollectionObject(path);
       }
     } else {
       throw new InvalidArgumentException("path");
@@ -51,47 +53,43 @@ class ObjectBase {
 
 
 class SystemObject extends ObjectBase {
-  constructor(path, onload) {
+  constructor(path) {
     if (!path.startsWith("system://") || path.indexOf("/", "system://".length) >= 0) {
       throw new InvalidArgumentException("path");
     }
 
     let _type = "System" + path.substr("system://".length);
 
-    super(_type, path, onload);
-  }
-
-  flush(oncomplete) {
-    throw new NotSupportedException();
+    super(_type, path);
   }
 }
 
 
 class DbCollectionObject extends ObjectBase {
-  constructor(path, onload) {
+  constructor(path) {
     if (!path.startsWith("name://") || path.indexOf("/", "name://".length) >= 0) {
       throw new InvalidArgumentException("path");
     }
 
-    this.name = path.substr("name://".length);
-    this.collection = "col_" + this.name;
-    let _type = "Collection" + this.name;
+    this._name = path.substr("name://".length);
+    this._collection = "col_" + this._name;
+    let _type = "Collection" + this._name;
 
-    super(_type, path, onload);
+    super(_type, path);
   }
 
 
   get name() {
-    return this.name;
+    return this._name;
   }
 
   
   get collection() {
-    return this.collection;
+    return this._collection;
   }
 
 
-  getChildren(query, offset, limit, callback) {
+  async getChildren(query, offset, limit) {
     db.assert();
 
     if (!offset || offset < 0) {
@@ -102,86 +100,51 @@ class DbCollectionObject extends ObjectBase {
       limit = 100;
     }
 
-    db.collection(this.collection)
-      .find(query)
-      .skip(offset)
-      .limit(limit)
-      .toArray(function(err, result) {
-        if (err) { throw new DbException(err); }
-        if (callback) {
-          callback(result);
-        }
-      });
+    return new Promise((resolve, reject) => {
+      db.collection(this._collection)
+        .find(query)
+        .skip(offset)
+        .limit(limit)
+        .toArray(function(err, result) { __handleDbResult(err, result, resolve, reject); });
+    });
   }
 
 
-  getChildCount(query, callback) {
+  async getChildCount(query) {
     db.assert();
 
-    db.collection(this.collection).find(query).count(function(err, result) {
-      if (err) { throw new DbException(err); }
-      if (callback) {
-        callback(result);
-      }
+    return new Promise((resolve, reject) => {
+      db.collection(this._collection)
+        .find(query)
+        .count(function(err, result) { __handleDbResult(err, result, resolve, reject); });
     });
   }
 
 
-  hasChild(path, callback) {
-    this.getChildCount({path : path}, function(count) {
-      if (callback) {
-        callback(count > 0);
-      }
-    });
+  async hasChild(path) {
+    let rtn = await this.getChildCount({path : path});
+    return rtn > 0;    
   }
 
 
-  getChild(path, callback) {
-    this.getChildren({path : path}, 0, 1, function(result) {
-      if (result.length == 0) {
-        throw new ObjectNotFoundException(path);
-      }
-      if (callback) {
-        callback(result[0]);
-      }
-    });
+  async getChild(path) {
+    let rtn = await this.getChildren({path: path}, 0, 1);
+    if (rtn.length == 0) {
+      throw new ObjectNotFoundException(path);
+    }
+
+    return rtn[0];
   }
 
 
-  addChild(type, path, props, callback) {
-    if (!path.startsWith("name://" + this.name + "/")) {
+  async addChild(type, path, props) {
+    if (!path.startsWith("name://" + this._name + "/")) {
       throw new InvalidArgumentException("path");
     }
 
-    let _this = this;
-
-    this.hasChild(path, function(exist) {
-      if (exist) {
-        throw new AlreadyExistException(path);
-      }
-
-      let obj = {
-        Path : path,
-        Type : type,
-        Properties : props ? props : {}
-      };
-
-      db.collection(_this.collection).updateOne({ path : path }, { "$set" : obj }, { upsert : true }, function(err, res) {
-        if (err) { throw new DbException(err); }
-        if (callback) {
-          callback(true);
-        }
-      });
-    });
-  }
-
-
-  updateChild(type, path, props, callback) {
-    if (!path.startsWith("name://" + this.name + "/")) {
-      throw new InvalidArgumentException("path");
+    if (await this.hasChild(path)) {
+      throw new AlreadyExistException(path);
     }
-
-    let _this = this;
 
     let obj = {
       Path : path,
@@ -189,32 +152,56 @@ class DbCollectionObject extends ObjectBase {
       Properties : props ? props : {}
     };
 
-    db.collection(_this.collection).updateOne({ path : path }, { "$set" : obj }, { upsert : true }, function(err, res) {
-      if (err) { throw new DbException(err); }
-      if (callback) {
-        callback(true);
-      }
+    return new Promise((resolve, reject) => {
+      db.collection(_this._collection).updateOne(
+        { path : path },
+        { "$set" : obj },
+        { upsert : true },
+        function(err, res) { __handleDbResult(err, res, resolve, reject); }
+      );
     });
   }
 
 
-  deleteChild(path, callback) {
+  async updateChild(type, path, props) {
+    if (!path.startsWith("name://" + this._name + "/")) {
+      throw new InvalidArgumentException("path");
+    }
+
+    let obj = {
+      Path : path,
+      Type : type,
+      Properties : props ? props : {}
+    };
+
+    return new Promise((resolve, reject) => {
+      db.collection(_this._collection).updateOne(
+        { path : path },
+        { "$set" : obj },
+        { upsert : true },
+        function(err, res) { __handleDbResult(err, res, resolve, reject); }
+      );
+    });
+  }
+
+
+  async deleteChild(path) {
     db.assert();
 
     let _this = this;
 
-    db.collection(_this.collection).remove({path : path}, function(err, res) {
-      if (err) { throw new DbException(err); }
-      if (callback) {
-        callback(true);
-      }
+    return new Promise((resolve, reject) => {
+      db.collection(_this._collection).remove(
+        {path : path},
+        function(err, res) { __handleDbResult(err, res, resolve, reject); }
+      );
     });
   }
 }
 
 
 class DbObject extends ObjectBase {
-  constructor(path, onload) {
+  constructor(path) {
     if (!path.startsWith("name://")) {
       throw new InvalidArgumentException("path");
     }
@@ -224,64 +211,56 @@ class DbObject extends ObjectBase {
       throw new InvalidArgumentException("path");
     }
 
-    this.collection = path.substr("name://".length, delim - "name://".length);
+    this._collection = path.substr("name://".length, delim - "name://".length);
 
-    this.properties = {};
+    this._properties = {};
 
-    super(null, path, onload);
+    super(null, path);
+  }
+
+  async init() {
+    let colobj = new DbCollectionObject("name://" + this.colname);
+    let obj = await colobj.getChild(this._path);
+
+    if (!obj || !obj.Type) {
+      throw new ObjectNotFoundException(this._path);
+    }
+
+    this._type = obj.Type;
+    this._properties = obj.Properties ? obj.Properties : {};
+    return this;
   }
 
   get properties() {
-    return this.properties;
+    return this._properties;
   }
 
   getProperty(key) {
-    return this.properties[key];
+    return this._properties[key];
   }
 
   hasProperty(key) {
-    return this.properties.hasOwnProperty(key);
+    return this._properties.hasOwnProperty(key);
   }
 
-  setProperty(key, val, oncomplete) {
-    this.properties[key] = val;
-    this.flush(oncomplete);
+  async flush() {
+    let _this = this;
+
+    let colobj = new DbCollectionObject("name://" + this.colname);
+    return await colobj.updateChild(this._type, this._path, this._properties);
   }
 
-  setProperties(props, oncomplete) {
+
+  async setProperty(key, val) {
+    this._properties[key] = val;
+    return await this.flush();
+  }
+
+  async setProperties(props) {
     for (var key in props) {
-      this.properties[key] = props[key];
+      this._properties[key] = props[key];
     }
-    this.flush(oncomplete);
-  }
-
-  flush(oncomplete) {
-    let _this = this;
-
-    let colobj = new DbCollectionObject("name://" + this.colname);
-    colobj.updateChild(_this.type, _this.path, _this.properties, function(res) {
-      if (oncomplete) {
-        oncomplete(_this);
-      }
-    });
-  }
-
-
-  __load(oncomplete) {
-    let _this = this;
-
-    let colobj = new DbCollectionObject("name://" + this.colname);
-    colobj.getChild(this.path, function(obj) {
-      if (!obj || !obj.Type) {
-        throw new ObjectNotFoundException(_this.path);
-      }
-
-      _this.type = obj.Type;
-      _this.properties = obj.Properties ? obj.Properties : {};
-      if (oncomplete) {
-        oncomplete(_this);
-      }
-    });
+    return await this.flush();
   }
 }
 

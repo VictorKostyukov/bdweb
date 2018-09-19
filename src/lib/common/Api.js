@@ -1,56 +1,61 @@
 #! /usr/bin/env node
 
-const NotSupportedException = require("Exception.js").NotSupportedException;
-const ObjectBase = require("Object.js").ObjectBase;
+const NotSupportedException = require("./Exception.js").NotSupportedException;
+const ObjectBase = require("./Object.js").ObjectBase;
 
 
 class Api {
   constructor(obj) {
-    this.obj = obj;
+    this._obj = obj;
   }
 
   get type() {
-    return this.obj.type;
+    return this._obj.type;
   }
 
   get path() {
-    return this.obj.path;
+    return this._obj.path;
+  }
+
+  get __object() {
+    return this._obj;
   }
 
   get __properties() {
-    return this.obj.properties ? this.obj.properties : {};
+    return this._obj.properties ? this._obj.properties : {};
   }
 
   __getProperty(key) {
-    return this.obj.getProperty ? this.obj.getProperty(key) : undefined;
+    return this._obj.getProperty ? this._obj.getProperty(key) : undefined;
   }
 
   __hasProperty(key) {
-    return this.obj.hasProperty ? this.obj.hasProperty(key) : false;
+    return this._obj.hasProperty ? this._obj.hasProperty(key) : false;
   }
 
-  __setProperty(key, val, oncomplete) {
-    if (this.obj.setProperty){
-      this.obj.setProperty(key, val, oncomplete);
-    } else {
+  async __setProperty(key, val) {
+    if (!this._obj.setProperty) {
       throw new NotSupportedException();
     }
+
+    return await this._obj.setProperty(key, val);
   }
 
-  ///////////////
+  async __setProperties(props) {
+    if (!this._obj.setProperties) {
+      throw new NotSupportedException();
+    }
 
-  __setProperties(props, oncomplete) {
-    this.obj.setProperties(props, oncomplete);
+    return await this._obj.setProperties(props);
   }
 
 
-  static create(path, onload) {
-    ObjectBase.create(path, function(obj) {
-      const apiType = require("../api/" + obj.type + "Api.js")[obj.type + "Api"];
-      if (onload) {
-        onload(new apiType(obj));
-      }
-    });
+  static async create(path) {
+    let obj = ObjectBase.create(path);
+    await obj.init();
+
+    const apiType = require("../api/" + obj.type + "Api.js").Api;
+    return new apiType(obj);
   }
 }
 

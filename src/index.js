@@ -1,28 +1,16 @@
 #! /usr/bin/env node
 
-var express = require("express");
-var app = express();
+const db = require("./lib/common/DbConnection.js").connection;
+const Router = require("./main/Router.js").Router;
 
-app.all("/", function(request, response) {
-  response.set("Content-Type", "text/html");
-  response.sendFile("views/index.html", { root : __dirname });
-});
+async function main() {
+  await db.init("bdtest");
+  
+  let router = new Router();
+  router.init();
 
-app.use(express.static("public"));
+  return await router.run(8080);
+}
 
-var registerHandler = function(path, file) {
-  app.get(path + "*", function(request, response) {
-    var handlers = require(file);
-    var action = request.path.substr(path.length);
-    handlers.handler(response, action, request.query);
-  });
-};
 
-registerHandler("/api/stats/Hosts/", "./handlers/Hosts.js");
-
-// Fake server
-registerHandler("/api/host/Kademlia/", "./handlers/Kademlia.js");
-
-app.listen(8800, function() {
-  console.log("Server started.\n");
-});
+main().then(() => console.log("Server started."));

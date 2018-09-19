@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "async-waterfall": "^0.1.5",
     "babel-cli": "^6.26.0",
     "babel-preset-react-app": "^3.1.2",
     "express": "^4.16.3",

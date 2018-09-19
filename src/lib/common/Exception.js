@@ -1,69 +1,82 @@
 #! /usr/bin/env node
 
+const ERR_GENERIC = 1;
+const ERR_INVALID_ARGUMENT = 2;
+const ERR_NOT_SUPPORTED = 3;
+const ERR_OBJECT_NOT_FOUND = 4;
+const ERR_ALREADY_EXIST = 5;
+const ERR_INVALID_OPERATION = 6;
+const ERR_DATABASE = 101;
+
 class Exception {
-  constructor(msg) {
-    this.msg = msg;
+  constructor(msg, code) {
+    this._msg = msg;
+    this._code = code;
   }
 
   get message() {
-    return this.message;
+    return this._msg;
+  }
+
+  get code() {
+    return this._code;
   }
 }
 
 
 class InvalidArgumentException extends Exception {
   constructor(name) {
-    super("Invalid argument: " + name);
+    super("Invalid argument: " + name, ERR_INVALID_ARGUMENT);
   }
 }
 
 
 class NotSupportedException extends Exception {
   constructor() {
-    super("The operation is not supported");
+    super("The operation is not supported", ERR_NOT_SUPPORTED);
   }
 }
 
 
 class ObjectNotFoundException extends Exception {
   constructor(path) {
-    super("Object not found: " + path);
-    this.path = path;
+    super("Object not found: " + path, ERR_OBJECT_NOT_FOUND);
+    this._path = path;
   }
 
   get path() {
-    return this.path;
+    return this._path;
   }
 }
 
 
 class AlreadyExistException extends Exception {
   constructor(path) {
-    super("Target already exists: " + path);
-    this.path = path;
+    super("Target already exists: " + path, ERR_ALREADY_EXIST);
+    this._path = path;
   }
 
   get path() {
-    return this.path;
+    return this._path;
   }
 }
 
 
 class InvalidOperationException extends Exception {
   constructor(msg) {
-    super("Invalid operation: " + msg);
+    super("Invalid operation: " + msg, ERR_INVALID_OPERATION);
   }
 }
 
 
 class DbException extends Exception {
   constructor(err) {
-    super("Database error");
-    this.err = err;
+    super("Database error", ERR_DATABASE);
+    this._err = err;
   }
 
   get error() {
-    return this.err;
+    return this._err;
   }
 }
 

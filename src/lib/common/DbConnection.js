@@ -1,6 +1,6 @@
 #! /usr/bin/env node
 
-const _exception = require("Exception.js");
+const _exception = require("./Exception.js");
 const DbException = _exception.DbException;
 const InvalidOperationException = _exception.InvalidOperationException;
 
@@ -8,49 +8,57 @@ const InvalidOperationException = _exception.InvalidOperationException;
 class DbConnection {
 
   constructor() {
-    this.client = null;
-    this.db = null;
-    this.name = null;
+    this._client = null;
+    this._db = null;
+    this._name = null;
+  }
+
+
+  get db() {
+    return this._db;
+  }
+
+
+  get name() {
+    return this._name;
   }
 
   
-  get name() {
-    return this.name;
-  }
-
-
-  init(name, onload) {
+  async init(name) {
     const url = "mongodb://localhost:27017";
-    let _this = this;
 
     let mongodb = require("mongodb");
-    mongodb.MongoClient.connect(url, { useNewUrlParser : true }, function(err, result) {
-      if (err) {
-        throw new DbException(err);
+    let rtn = await new Promise((resolve, reject) =>
+      mongodb.MongoClient.connect(url, { useNewUrlParser : true}, function(err, result) {
+        if (err) {
+          reject(new DbException(err));
+        } else {
+          resolve(result);
+        }
       }
+    ));
 
-      _this.client = result;
-      _this.db = _this.client.db(name);
-      _this.name = name;
-    });
+    this._client = rtn;
+    this._db = this._client.db(name);
+    this._name = name;
+
+    return rtn;
   }
 
 
   collection(key) {
-    return _this.db.collection(key);
+    return _this._db.collection(key);
   }
 
 
   assert() {
-    if (!this.client || !this.db) {
+    if (!this._client || !this._db) {
       throw new InvalidOperationException("Database connection is not available.");
     }
   }
-
-  static connection = new DbConnection();
 }
 
 
 module.exports = {
-  DbConnection : DbConnection
-}
+  connection : new DbConnection()
+};
