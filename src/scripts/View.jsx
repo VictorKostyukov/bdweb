@@ -1,4 +1,7 @@
-class View extends React.Component {
+const NavigationBar = require("./controls/NavigationBar.jsx").NavigationBar;
+
+
+class View extends React.PureComponent {
   constructor(props) {
     super(props);
 
@@ -36,7 +39,9 @@ class View extends React.Component {
 
     return (
       <div>
-        <div>This is from the base view.</div>
+        <NavigationBar nav={[{name: "test1", text: "Test1", href:"#"}, {name:"test2", text:"Test2", href:"#"}]} 
+                       current="test2">
+        </NavigationBar>
         <div>
           <_Page />
         </div>
