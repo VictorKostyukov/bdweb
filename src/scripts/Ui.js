@@ -10,16 +10,18 @@ const UI = {
 
 
   render : function() {
-    let load = async () => {
-      let str = await $.ajax({ url : UI.location.apiUrl });
-      let obj = JSON.parse(str);
-
-      let view = require("./views/" + obj.Type + "View.js");
-      ReactDOM.render(
-        React.createElement(view, { api : obj, location : UI.location }),
-        document.getElementById("main")
-      );
-    };
+    $.ajax({url : UI.location.viewUrl + UI.location.action})
+      .done(function(obj) {
+        let viewName = obj.Type + "View";
+        let view = require("./views/" + viewName + ".jsx");
+        ReactDOM.render(
+          React.createElement(view[viewName], { path : obj.Path, type : obj.Type, model : obj.Model, location : UI.location }),
+          document.getElementById("main")
+        );
+      })
+      .fail(function(jqXHR, status, err) {
+        throw err;
+      });
   },
 
 
@@ -44,19 +46,30 @@ const UI = {
     }
 
     let path = components[0] + ":/";
-    let apiUrl = "/api/" + components[0] + "/";
+    let tmpUrl = components[0] + "/";
     for (let i = 1; i < components.length - 1; ++i) {
       path += "/" + components[i];
-      apiUrl += components[i] + "/";
+      tmpUrl += components[i] + "/";
     }
 
     let action = components[components.length - 1];
+    let apiUrl = "/api/" + tmpUrl;
+    let viewUrl = "/view/" + tmpUrl;
+
     UI.location = {
       path : path,
       apiUrl : apiUrl,
+      viewUrl : viewUrl,
       action : action
     };
 
     UI.render();
   }
+};
+
+
+UI.init();
+
+module.exports = {
+  UI : UI
 };

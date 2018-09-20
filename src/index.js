@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 
 const db = require("./lib/common/DbConnection.js").connection;
-const Router = require("./main/Router.js").Router;
+const Router = require("./Router.js").Router;
 
 async function main() {
   await db.init("bdtest");

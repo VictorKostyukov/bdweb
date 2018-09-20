@@ -18,5 +18,5 @@ class SystemTestApi extends Api {
 
 
 module.exports = {
-  Api : SystemTestApi
+  SystemTestApi : SystemTestApi
 };

@@ -54,7 +54,8 @@ class Api {
     let obj = ObjectBase.create(path);
     await obj.init();
 
-    const apiType = require("../api/" + obj.type + "Api.js").Api;
+    let type = obj.type + "Api";
+    const apiType = require("../api/" + type + ".js")[type];
     return new apiType(obj);
   }
 }
