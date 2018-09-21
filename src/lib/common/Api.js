@@ -7,6 +7,8 @@ const ObjectBase = require("./Object.js").ObjectBase;
 class Api {
   constructor(obj) {
     this._obj = obj;
+    this._request = null;
+    this._response = null;
   }
 
   get type() {
@@ -17,23 +19,39 @@ class Api {
     return this._obj.path;
   }
 
-  get __object() {
+  get request() {
+    return this._request;
+  }
+
+  set request(val) {
+    this._request = val;
+  }
+
+  get response() {
+    return this._response;
+  }
+
+  set response(val) {
+    this._response = val;
+  }
+
+  get object() {
     return this._obj;
   }
 
-  get __properties() {
+  get properties() {
     return this._obj.properties ? this._obj.properties : {};
   }
 
-  __getProperty(key) {
+  getProperty(key) {
     return this._obj.getProperty ? this._obj.getProperty(key) : undefined;
   }
 
-  __hasProperty(key) {
+  hasProperty(key) {
     return this._obj.hasProperty ? this._obj.hasProperty(key) : false;
   }
 
-  async __setProperty(key, val) {
+  async setProperty(key, val) {
     if (!this._obj.setProperty) {
       throw new NotSupportedException();
     }
@@ -41,7 +59,7 @@ class Api {
     return await this._obj.setProperty(key, val);
   }
 
-  async __setProperties(props) {
+  async setProperties(props) {
     if (!this._obj.setProperties) {
       throw new NotSupportedException();
     }
@@ -50,13 +68,16 @@ class Api {
   }
 
 
-  static async create(path) {
+  static async create(path, req, res) {
     let obj = ObjectBase.create(path);
     await obj.init();
 
     let type = obj.type + "Api";
     const apiType = require("../api/" + type + ".js")[type];
-    return new apiType(obj);
+    let api = new apiType(obj);
+    api.request = req;
+    api.response = res;
+    return api;
   }
 }
 

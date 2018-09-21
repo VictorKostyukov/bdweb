@@ -1,4 +1,5 @@
 const NavigationBar = require("./controls/NavigationBar.jsx").NavigationBar;
+const loc = require("./Ui.js").UI.loc;
 
 
 class View extends React.PureComponent {
@@ -33,18 +34,46 @@ class View extends React.PureComponent {
   }
 
 
-  render() {
+  __renderNavigationBar() {
+    let props = this.model && this.model.view && this.model.view.navigationBar ? this.model.view.navigationBar : {};
 
+    if (!props.hidden) {
+      let navs = [
+        { name : "Home", text : loc("Nav_Home"), href : "#" },
+        { name : "Hosts", text : loc("Nav_Hosts"), href : "#" },
+        { name : "Clients", text : loc("Nav_Clients"), href : "#" },
+        { name : "Contracts", text : loc("Nav_Contracts"), href : "#" }
+      ];
+
+      return (
+        <NavigationBar nav={navs} current={props.current} logo="/res/img/drive_logo.png">
+        </NavigationBar>
+      );
+    } else {
+      return (null);
+    }
+  }
+
+
+  render() {
     const _Page = () => this.onRender();
 
-    return (
-      <div>
-        <NavigationBar nav={[{name: "test1", text: "Test1", href:"#"}, {name:"test2", text:"Test2", href:"#"}]} 
-                       current="test2">
-        </NavigationBar>
-        <div>
+    let props = this.model && this.model.view ? this.model.view : {};
+    let page;
+    if (props.noContainer) {
+      page = (<_Page />);
+    } else {
+      page = (
+        <div class="container">
           <_Page />
         </div>
+      );
+    }
+
+    return (
+      <div class="bd-container">
+        { this.__renderNavigationBar() }
+        { page }
       </div>
     );
   }

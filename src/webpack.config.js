@@ -5,8 +5,7 @@ var BUILD_DIR = path.resolve(__dirname, 'public/res/js/gen');
 var APP_DIR = path.resolve(__dirname, 'scripts');
 
 const srcs = [
-  "Ui.js",
-  "View.jsx"
+  "Ui.js"
 ];
 
 const entries = srcs.map(src => `${APP_DIR}/${src}`);

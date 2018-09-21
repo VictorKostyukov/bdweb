@@ -1,3 +1,6 @@
+const loc = require("../Ui.js").UI.loc;
+
+
 class NavigationBar extends React.PureComponent {
   constructor(props) {
     super(props);
@@ -31,12 +34,12 @@ class NavigationBar extends React.PureComponent {
   __renderLogo() {
     if (this.logo) {
       return (
-        <a class="navbar-brand mr00 mr-md-2" href="/" aria-label="Drive">
-          <img src={this.logo} alt="Logo" width="200" height="100"></img>
+        <a class="navbar-brand" href="/" aria-label="Drive">
+          <img src={this.logo} alt="Logo" height="32"></img>
         </a>
       );
     } else {
-      return (<div width="200" height="100"></div>);
+      return (<div class="navbar-brand" height="32"></div>);
     }
   }
 
@@ -44,9 +47,13 @@ class NavigationBar extends React.PureComponent {
   __renderNavItems() {
     if (this.nav && this.nav.length > 0) {
       return this.nav.map(item =>
-        <li class="nav-item">
-          <a class={"nav-link" + (item.name === this.current ? " active" : "")} href={item.href}>{item.text}</a>
-        </li>
+        item.name === this.current
+        ? <li class="nav-item active">
+            <span class="nav-link">{item.text} <span class="sr-only">{ loc("SR_Current") }</span></span>
+          </li>
+        : <li class="nav-item">
+            <a class="nav-link" href={item.href}>{item.text}</a>
+          </li>
       );
     } else {
       return (null);
@@ -63,15 +70,13 @@ class NavigationBar extends React.PureComponent {
     if (this.user) {
       return (
         <li class="nav-item">
-          <a class="nav-link" onClick={() => this.__onLogout()} href="#">Logout</a>
+          <a class="nav-link" onClick={() => this.__onLogout()} href="#">{ loc("Sign Out") }</a>
         </li>
       );
     } else {
       return (
         <li class="nav-item">
-          <a class="btn d-done d-lg-inline-block mb-3 mb-md-0 ml-md-3" href="/#/view/system/Security/Login">
-            Login
-          </a>
+          <button class="btn btn-primary my-sm-0">{ loc("Sign In") }</button>
         </li>
       )
     }
@@ -80,13 +85,17 @@ class NavigationBar extends React.PureComponent {
 
   render() {
     return (
-      <nav class="navbar navbar-expand navbar-light bg-light">
+      <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-3 bd-nav-main">
         { this.__renderLogo() }
-        <div class="navbar-nav-scroll">
-          <ul class="navbar-nav bd-navbar-nav flex-row">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsMain" aria-controls="navbarsMain" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarsMain">
+          <ul class="navbar-nav mr-auto">
             { this.__renderNavItems() }
           </ul>
-          <ul class="navbar-nav flex-row ml-md-auto d-done d-md-flex">
+          <ul class="navbar-nav my-2 my-lg-0">
             { this.__renderUserButtons() }
           </ul>
         </div>

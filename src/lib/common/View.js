@@ -33,8 +33,8 @@ class View {
   }
 
 
-  static async create(path) {
-    let api = await Api.create(path);
+  static async create(path, req, res) {
+    let api = await Api.create(path, req, res);
 
     let type = api.type + "View";
     const viewType = require(`../view/${type}.js`)[type];

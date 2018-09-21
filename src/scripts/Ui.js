@@ -1,10 +1,22 @@
+const Resources_default = require("./localization/Resources.js");
+
 const UI = {
 
   _defaultUrl : "/#/view/system/Home/",
+  _locale : null,
 
   location : {},
 
   init : function() {
+    UI.setLocale("en-US");
+
+    let errorHandler = event => UI.handleError(event.reason);
+    window.addEventListener("unhandledrejection", errorHandler);
+    if (!"onunhanbledreject" in window) {
+      window.onunhanbledreject = errorHandler;
+    }
+
+    window.onerror = (msg, url, line, col, err) => UI.handleError(err);
     $(window).on("hashchange", e => UI.__onHashChanged(location.hash)).trigger("hashchange");
   },
 
@@ -12,6 +24,8 @@ const UI = {
   render : function() {
     $.ajax({url : UI.location.viewUrl + UI.location.action})
       .done(function(obj) {
+        ReactDOM.render(null, document.getElementById("main"));
+
         let viewName = obj.Type + "View";
         let view = require("./views/" + viewName + ".jsx");
         ReactDOM.render(
@@ -64,6 +78,61 @@ const UI = {
     };
 
     UI.render();
+  },
+
+
+  getLocale : function() {
+    if (!UI._locale || !UI._locale.name) {
+      return "en-US";
+    }
+    return UI._locale.name;
+  },
+
+
+  setLocale : function(val) {
+    let resources = Resources_default;
+    if (val && val != "en-US") {
+      const filename = `Resources.${val}`;
+      resources = require("./localization/" + filename + ".js");
+    }
+
+    UI._locale = {
+      name : val,
+      resources : resources
+    };
+  },
+
+
+  loc : function(key) {
+    if (UI._locale && UI._locale.resources && key in UI._locale.resources) {
+      return UI._locale.resources[key];
+    } else if (key in Resources_default) {
+      return Resources_default[key];
+    } else {
+      console.warn(`[LOCALIZATION] Resource not localized: ${key}`);
+      return key;
+    }
+  },
+
+
+  redirect(url) {
+    window.location = url;
+  },
+
+
+  handleError(err) {
+    console.log(err);
+
+    if (typeof(err) === "string") {
+      alert(err);
+    } else if (err.Type === "Error") {
+      alert(err.Message);
+      if (err.Code === 201) { // LOGIN_EXPIRED
+        UI.redirect("/#/view/system/Security/Login");
+      }
+    } else if (err.message) {
+      alert(err.message);
+    }
   }
 };
 

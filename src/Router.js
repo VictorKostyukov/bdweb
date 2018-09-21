@@ -1,6 +1,7 @@
 #! /usr/bin/env node
 
 const InvalidArgumentException = require("./lib/common/Exception.js").InvalidArgumentException;
+const NotSupportedException = require("./lib/common/Exception.js").NotSupportedException;
 const Api = require("./lib/common/Api.js").Api;
 const View = require("./lib/common/View.js").View;
 
@@ -24,21 +25,27 @@ class Router {
     let _this = this;
 
     let handler = function(method, req, res) {
-      let uri = Router.__parseUrl(req.path);
-      let args = Router.__parseArguments(req);
-      let func = method.bind(_this);
-
-      func(uri.path, uri.action, args, res)
-        .then(result => {
-          res.json(result);
-        })
-        .catch(ex => {
-          res.status(500).json({
-            Type : "Error",
-            Code : ex.code ? ex.code : 1,
-            Message : ex.message
-          })
+      let handleError = ex => {
+        res.json({
+          Type : "Error",
+          Code : ex.code ? ex.code : 1,
+          Message : ex.message
         });
+      };
+
+      try {
+        let uri = Router.__parseUrl(req.path);
+        let args = Router.__parseArguments(req);
+        let func = method.bind(_this);
+
+        func(uri.path, uri.action, args, res)
+          .then(result => {
+            res.json(result);
+          })
+          .catch(handleError);
+      } catch(ex) {
+        handleError(ex);
+      }
     };
 
     this.app.all("/api/*", function(req, res) { handler(_this.__callApi, req, res); });
@@ -52,12 +59,16 @@ class Router {
 
 
   async __callApi(path, action, args, request, response) {
-    let api = await Api.create(path);
+    let api = await Api.create(path, request, response);
 
     if (action) {
       let func = api[action];
+      if (!func) {
+        throw new NotSupportedException();
+      }
+
       let method = func.bind(api);
-      return await method(args, request, response);
+      return await method(args);
     } else {
       return {
         Path : api.path,
@@ -68,7 +79,7 @@ class Router {
 
 
   async __callView(path, action, args, request, response) {
-    let view = await View.create(path);
+    let view = await View.create(path, request, response);
     await view.init();
 
     let func;
@@ -78,8 +89,12 @@ class Router {
       func = view.model;
     }
 
+    if (!func) {
+      throw new NotSupportedException();
+    }
+
     let method = func.bind(view);
-    return method(args, request, response);
+    return method(args);
   }
 
 

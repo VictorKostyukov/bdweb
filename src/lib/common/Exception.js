@@ -7,6 +7,9 @@ const ERR_OBJECT_NOT_FOUND = 4;
 const ERR_ALREADY_EXIST = 5;
 const ERR_INVALID_OPERATION = 6;
 const ERR_DATABASE = 101;
+const ERR_LOGIN_EXPIRED = 201;
+const ERR_ACCESS_DENIED = 202;
+
 
 class Exception {
   constructor(msg, code) {
@@ -81,6 +84,20 @@ class DbException extends Exception {
 }
 
 
+class LoginExpiredException extends Exception {
+  constructor() {
+    super("Login expired.", ERR_LOGIN_EXPIRED);
+  }
+}
+
+
+class AccessDeniedException extends Exception {
+  constructor() {
+    super("Access denied.", ERR_ACCESS_DENIED);
+  }
+}
+
+
 module.exports = {
   Exception : Exception,
   InvalidArgumentException : InvalidArgumentException,
@@ -88,5 +105,7 @@ module.exports = {
   ObjectNotFoundException : ObjectNotFoundException,
   AlreadyExistException : AlreadyExistException,
   InvalidOperationException : InvalidOperationException,
-  DbException : DbException
+  DbException : DbException,
+  LoginExpiredException : LoginExpiredException,
+  AccessDeniedException : AccessDeniedException
 };
