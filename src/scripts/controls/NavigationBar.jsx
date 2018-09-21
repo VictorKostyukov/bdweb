@@ -1,4 +1,5 @@
-const loc = require("../Ui.js").UI.loc;
+const UI = require("../Ui.js").UI;
+const loc = UI.loc;
 
 
 class NavigationBar extends React.PureComponent {
@@ -76,7 +77,10 @@ class NavigationBar extends React.PureComponent {
     } else {
       return (
         <li class="nav-item">
-          <button class="btn btn-primary my-sm-0">{ loc("Sign In") }</button>
+          <button class="btn btn-primary my-sm-0"
+                  onClick={() => UI.redirect("/#/view/system/Security/Login")}>
+            { loc("Sign In") }
+          </button>
         </li>
       )
     }
