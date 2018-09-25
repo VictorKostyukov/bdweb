@@ -6,7 +6,7 @@ const ObjectNotFoundException = _exception.ObjectNotFoundException;
 const AlreadyExistException = _exception.AlreadyExistException;
 const DbException = _exception.DbException;
 
-const db = require("./DbConnection.js").connection.db;
+const dbconn = require("./DbConnection.js").connection;
 
 
 const __handleDbResult = function(err, result, resolve, reject) {
@@ -71,11 +71,11 @@ class DbCollectionObject extends ObjectBase {
       throw new InvalidArgumentException("path");
     }
 
-    this._name = path.substr("name://".length);
-    this._collection = "col_" + this._name;
-    let _type = "Collection" + this._name;
-
+    let _type = path.substr("name://".length);
     super(_type, path);
+
+    this._name = _type;
+    this._collection = "col_" + this._name;
   }
 
 
@@ -90,7 +90,7 @@ class DbCollectionObject extends ObjectBase {
 
 
   async getChildren(query, offset, limit) {
-    db.assert();
+    dbconn.assert();
 
     if (!offset || offset < 0) {
       offset = 0;
@@ -101,7 +101,7 @@ class DbCollectionObject extends ObjectBase {
     }
 
     return new Promise((resolve, reject) => {
-      db.collection(this._collection)
+      dbconn.db.collection(this._collection)
         .find(query)
         .skip(offset)
         .limit(limit)
@@ -111,10 +111,10 @@ class DbCollectionObject extends ObjectBase {
 
 
   async getChildCount(query) {
-    db.assert();
+    dbconn.assert();
 
     return new Promise((resolve, reject) => {
-      db.collection(this._collection)
+      dbconn.db.collection(this._collection)
         .find(query)
         .count(function(err, result) { __handleDbResult(err, result, resolve, reject); });
     });
@@ -153,7 +153,7 @@ class DbCollectionObject extends ObjectBase {
     };
 
     return new Promise((resolve, reject) => {
-      db.collection(_this._collection).updateOne(
+      dbconn.db.collection(this._collection).updateOne(
         { path : path },
         { "$set" : obj },
         { upsert : true },
@@ -175,7 +175,7 @@ class DbCollectionObject extends ObjectBase {
     };
 
     return new Promise((resolve, reject) => {
-      db.collection(_this._collection).updateOne(
+      dbconn.db.collection(this._collection).updateOne(
         { path : path },
         { "$set" : obj },
         { upsert : true },
@@ -186,12 +186,12 @@ class DbCollectionObject extends ObjectBase {
 
 
   async deleteChild(path) {
-    db.assert();
+    dbconn.assert();
 
     let _this = this;
 
     return new Promise((resolve, reject) => {
-      db.collection(_this._collection).remove(
+      dbconn.db.collection(_this._collection).remove(
         {path : path},
         function(err, res) { __handleDbResult(err, res, resolve, reject); }
       );
@@ -211,11 +211,15 @@ class DbObject extends ObjectBase {
       throw new InvalidArgumentException("path");
     }
 
+    super(null, path);
+
     this._collection = path.substr("name://".length, delim - "name://".length);
 
     this._properties = {};
+  }
 
-    super(null, path);
+  get colname() {
+    return this._collection;
   }
 
   async init() {

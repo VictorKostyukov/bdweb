@@ -4,6 +4,8 @@ const InvalidArgumentException = require("./lib/common/Exception.js").InvalidArg
 const NotSupportedException = require("./lib/common/Exception.js").NotSupportedException;
 const Api = require("./lib/common/Api.js").Api;
 const View = require("./lib/common/View.js").View;
+const ObjectBase = require("./lib/common/Object.js").ObjectBase;
+const Security = require("./lib/common/Security.js").Security;
 
 
 class Router {
@@ -38,11 +40,24 @@ class Router {
         let args = Router.__parseArguments(req);
         let func = method.bind(_this);
 
-        func(uri.path, uri.action, args, res)
-          .then(result => {
-            res.json(result);
-          })
-          .catch(handleError);
+        let worker = async function() {
+          let security = new Security();
+          if (args.st) {
+            let expires = await security.parseSecurityToken(args.st);
+            if (security.shouldRenewSecurityToken(expires)) {
+              let token = security.getSecurityToken();
+              res.cookies("st", token);
+            }
+          }
+
+          req.security = security;
+
+          let result = await func(uri.path, uri.action, args, req, res);
+          res.json(Router.__normalizeResult(result));
+          return true;
+        };
+
+        worker().catch(handleError);
       } catch(ex) {
         handleError(ex);
       }
@@ -50,6 +65,15 @@ class Router {
 
     this.app.all("/api/*", function(req, res) { handler(_this.__callApi, req, res); });
     this.app.all("/view/*", function(req, res) { handler(_this.__callView, req, res); });
+  }
+
+
+  static __normalizeResult(result) {
+    if (result instanceof Api || result instanceof ObjectBase) {
+      return { Type : result.type, Path : result.path };
+    } else {
+      return result;
+    }
   }
 
 

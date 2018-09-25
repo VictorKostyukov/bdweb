@@ -42,12 +42,39 @@ class DbConnection {
     this._db = this._client.db(name);
     this._name = name;
 
+    this.__initIndex();
+
     return rtn;
   }
 
 
+  __initIndex() {
+    const fs = require("fs");
+    fs.readdirSync(__dirname + "/../api").forEach(file => {
+      if (!file.endsWith("Api.js") || file.startsWith("System")) {
+        return;
+      }
+
+      let className = file.substr(0, file.length - ".js".length);
+      let collectionName = "col_" + className.substr(0, className.length - "Api".length);
+
+      let classDef = require("../api/" + file)[className];
+      if (!classDef || !classDef.index) {
+        return;
+      }
+
+      console.log(`Processing index for ${collectionName}`);
+
+      let dbo = this.collection(collectionName);
+      for (let i = 0; i < classDef.index.length; ++i) {
+        dbo.createIndex(classDef.index[i]);
+      }
+    });
+  }
+
+
   collection(key) {
-    return _this._db.collection(key);
+    return this._db.collection(key);
   }
 
 

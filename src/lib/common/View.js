@@ -13,6 +13,10 @@ class View {
     return this._api;
   }
 
+  get security() {
+    return this.api.security;
+  }
+
 
   async init() {
     return true;

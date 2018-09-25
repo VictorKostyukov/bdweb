@@ -3,6 +3,7 @@
 const Api = require("../common/Api.js").Api;
 const LoginExpiredException = require("../common/Exception.js").LoginExpiredException;
 const AccessDeniedException = require("../common/Exception.js").AccessDeniedException;
+const Role = require("../common/Security.js").Role;
 
 
 class SystemSecurityApi extends Api {
@@ -12,7 +13,9 @@ class SystemSecurityApi extends Api {
 
 
   async GetUser() {
-    throw new LoginExpiredException();
+    this.security.verify(this, "userPlus");
+
+    return this.security.user;
   }
 
 

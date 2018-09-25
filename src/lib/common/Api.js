@@ -2,6 +2,7 @@
 
 const NotSupportedException = require("./Exception.js").NotSupportedException;
 const ObjectBase = require("./Object.js").ObjectBase;
+const Security = require("./Security.js").Security;
 
 
 class Api {
@@ -9,6 +10,7 @@ class Api {
     this._obj = obj;
     this._request = null;
     this._response = null;
+    this._security = new Security();
   }
 
   get type() {
@@ -25,6 +27,7 @@ class Api {
 
   set request(val) {
     this._request = val;
+    this._security = val.security ? val.security : this._security;
   }
 
   get response() {
@@ -37,6 +40,10 @@ class Api {
 
   get object() {
     return this._obj;
+  }
+
+  get security() {
+    return this._security;
   }
 
   get properties() {
@@ -65,6 +72,43 @@ class Api {
     }
 
     return await this._obj.setProperties(props);
+  }
+
+  async getChildren(query, offset, limit) {
+    let objs = await this._obj.getChildren(query, offset, limit);
+    let result = [];
+    if (objs) {
+      for (let i = 0; i < objs.length; ++i) {
+        result.push(Api.create(objs[i].path, this.request, this.response));
+      }
+    }
+    return result;
+  }
+
+  async getChildCount(query) {
+    return this._obj.getChildCount(query);
+  }
+
+  async hasChild(path) {
+    return this._obj.hasChild(path);
+  }
+
+  async addChild(type, path, props) {
+    await this._obj.addChild(type, path, props);
+    return true;
+  }
+
+  async deleteChild(path) {
+    await this._obj.deleteChild(path);
+    return true;
+  }
+
+  async delete() {
+    let lastDelim = this.path.lastIndexOf("/");
+    let parentPath = this.path.substr(0, lastDelim);
+
+    let parent = Api.create(parentPath, this.request, this.response);
+    return parent.deleteChild(this.path);
   }
 
 
