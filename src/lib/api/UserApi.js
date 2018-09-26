@@ -2,7 +2,9 @@
 
 const Api = require("../common/Api.js").Api;
 const PasswordCredential = require("../common/Credential.js").PasswordCredential;
-const InvalidArgumentException = require("../common/Exception.js").InvalidArgumentException;
+const _exceptions = require("../common/Exception.js");
+const InvalidArgumentException = _exceptions.InvalidArgumentException;
+const InvalidCredentialException = _exceptions.InvalidCredentialException;
 
 class UserApi extends Api {
   constructor(obj) {
@@ -40,10 +42,13 @@ class UserApi extends Api {
     credential.credential = this.getCredential("Password");
 
     let success = await credential.verify(password);
-    let st = this.security.getSecurityToken();
+    let st;
     if (success) {
       this.security.user = this;
+      st = this.security.getSecurityToken();
       this.response.cookie("st", st);
+    } else {
+      throw new InvalidCredentialException();
     }
 
     return st;

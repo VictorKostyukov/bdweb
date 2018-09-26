@@ -22,14 +22,16 @@ class SystemSecurityView extends View {
       if (!formData.inputUserName || !formData.inputPassword) {
         throw Error(loc("Please enter your user name and password."));
       } else {
-        let api = new Api("system/Security");
+        let api = new Api("system://Security");
         api.call("LoginPassword", {
           username : formData.inputUserName,
           password : formData.inputPassword
         }).then(result => {
           UI.redirect("/#/view/system/Home/");
-        })
+        });
       }
+
+      event.preventDefault();
     };
 
     return (

@@ -57,7 +57,7 @@ class Router {
             let expires = await security.parseSecurityToken(args.st);
             if (security.shouldRenewSecurityToken(expires)) {
               let token = security.getSecurityToken();
-              res.cookies("st", token);
+              res.cookie("st", token);
             }
           }
 

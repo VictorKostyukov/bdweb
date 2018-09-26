@@ -9,7 +9,6 @@ class NavigationBar extends React.PureComponent {
     this._logo = props.logo;
     this._nav = props.nav ? props.nav : [];
     this._current = props.current;
-    this._user = props.user;
   }
 
 
@@ -25,10 +24,6 @@ class NavigationBar extends React.PureComponent {
 
   get current() {
     return this._current;
-  }
-
-  get user() {
-    return this._user;
   }
 
 
@@ -63,24 +58,24 @@ class NavigationBar extends React.PureComponent {
 
 
   __onLogout() {
-    alert("Logout");
+    UI.cookie.remove("st");
   }
 
 
   __renderUserButtons() {
-    if (this.user) {
+    let st = UI.cookie.get("st");
+    if (st && st.length > 0) {
       return (
         <li class="nav-item">
-          <a class="nav-link" onClick={() => this.__onLogout()} href="#">{ loc("Sign Out") }</a>
+          <a class="nav-link" onClick={() => this.__onLogout()} href="/#/view/system/Security/Login">{ loc("Sign Out") }</a>
         </li>
       );
     } else {
       return (
         <li class="nav-item">
-          <button class="btn btn-primary my-sm-0"
-                  onClick={() => UI.redirect("/#/view/system/Security/Login")}>
+          <a class="btn btn-primary my-sm-0" href="/#/view/system/Security/Login">
             { loc("Sign In") }
-          </button>
+          </a> 
         </li>
       )
     }

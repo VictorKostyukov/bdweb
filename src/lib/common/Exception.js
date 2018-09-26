@@ -9,6 +9,7 @@ const ERR_INVALID_OPERATION = 6;
 const ERR_DATABASE = 101;
 const ERR_LOGIN_EXPIRED = 201;
 const ERR_ACCESS_DENIED = 202;
+const ERR_INVALID_CREDENTIAL = 203;
 
 
 class Exception {
@@ -98,6 +99,13 @@ class AccessDeniedException extends Exception {
 }
 
 
+class InvalidCredentialException extends Exception {
+  constructor() {
+    super("Invalid credential.", ERR_INVALID_CREDENTIAL);
+  }
+}
+
+
 module.exports = {
   Exception : Exception,
   InvalidArgumentException : InvalidArgumentException,
@@ -107,5 +115,6 @@ module.exports = {
   InvalidOperationException : InvalidOperationException,
   DbException : DbException,
   LoginExpiredException : LoginExpiredException,
-  AccessDeniedException : AccessDeniedException
+  AccessDeniedException : AccessDeniedException,
+  InvalidCredentialException : InvalidCredentialException
 };

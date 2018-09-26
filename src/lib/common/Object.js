@@ -122,13 +122,13 @@ class DbCollectionObject extends ObjectBase {
 
 
   async hasChild(path) {
-    let rtn = await this.getChildCount({path : path});
+    let rtn = await this.getChildCount({Path : path});
     return rtn > 0;    
   }
 
 
   async getChild(path) {
-    let rtn = await this.getChildren({path: path}, 0, 1);
+    let rtn = await this.getChildren({Path: path}, 0, 1);
     if (rtn.length == 0) {
       throw new ObjectNotFoundException(path);
     }
@@ -154,7 +154,7 @@ class DbCollectionObject extends ObjectBase {
 
     return new Promise((resolve, reject) => {
       dbconn.db.collection(this._collection).updateOne(
-        { path : path },
+        { Path : path },
         { "$set" : obj },
         { upsert : true },
         function(err, res) { __handleDbResult(err, res, resolve, reject); }
@@ -176,7 +176,7 @@ class DbCollectionObject extends ObjectBase {
 
     return new Promise((resolve, reject) => {
       dbconn.db.collection(this._collection).updateOne(
-        { path : path },
+        { Path : path },
         { "$set" : obj },
         { upsert : true },
         function(err, res) { __handleDbResult(err, res, resolve, reject); }
@@ -192,7 +192,7 @@ class DbCollectionObject extends ObjectBase {
 
     return new Promise((resolve, reject) => {
       dbconn.db.collection(_this._collection).remove(
-        {path : path},
+        { Path : path },
         function(err, res) { __handleDbResult(err, res, resolve, reject); }
       );
     });

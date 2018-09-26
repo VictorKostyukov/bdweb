@@ -119,25 +119,50 @@ const UI = {
   },
 
 
-  redirect(url) {
+  redirect : function(url) {
     window.location = url;
   },
 
 
-  handleError(err) {
+  handleError : function(err) {
     console.log(err);
 
     if (typeof(err) === "string") {
       alert(err);
     } else if (err.Type === "Error") {
       if (err.Code === 201 || err.Code === 202) { // LOGIN_EXPIRED || ACCESS_DENIED
-        document.cookie = "st=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+        UI.cookie.remove("st");
         UI.redirect("/#/view/system/Security/Login");
       } else {
         alert(err.Message);
       }
     } else if (err.message) {
       alert(err.message);
+    }
+  },
+
+
+  cookie : {
+    get : function(name) {
+      let i,x,y;
+      let ARRcookies=document.cookie.split(";");
+
+      for (i=0;i<ARRcookies.length;i++)
+      {
+        x=ARRcookies[i].substr(0,ARRcookies[i].indexOf("="));
+        y=ARRcookies[i].substr(ARRcookies[i].indexOf("=")+1);
+        x=x.replace(/^\s+|\s+$/g,"");
+        if (x==name)
+        {
+          return unescape(y);
+        }
+      }
+    },
+    set : function(name, value) {
+      document.cookie = name + "=" + value + ";Path=/";
+    },
+    remove : function(name) {
+      document.cookie = name + "=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
     }
   }
 };
