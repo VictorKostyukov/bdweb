@@ -40,9 +40,9 @@ class View extends React.PureComponent {
     if (!props.hidden) {
       let navs = [
         { name : "Home", text : loc("Nav_Home"), href : "/#/view/system/Home/" },
-        { name : "Hosts", text : loc("Nav_Hosts"), href : "/#/view/system/Hosts/" },
-        { name : "Clients", text : loc("Nav_Clients"), href : "/#/view/system/Home/Clients" },
-        { name : "Contracts", text : loc("Nav_Contracts"), href : "/#/view/system/Home/Contracts" }
+        { name : "Hosts", text : loc("Nav_Hosts"), href : "/#/view/system/Host/" },
+        { name : "Clients", text : loc("Nav_Clients"), href : "/#/view/system/Client/" },
+        { name : "Contracts", text : loc("Nav_Contracts"), href : "/#/view/system/Contract/" }
       ];
 
       return (

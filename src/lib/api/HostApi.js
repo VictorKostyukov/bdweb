@@ -10,36 +10,36 @@ class HostApi extends Api {
 
 
   async GetId() {
-    this.security.verify("ownerPlus");
+    this.security.verify(this, "ownerPlus");
     return this.getId();
   }
 
 
   async GetAddress() {
-    this.security.verify("ownerPlus");
+    this.security.verify(this, "ownerPlus");
     return this.getProperty("Address");
   }
 
 
   async GetAvailableSpace() {
-    this.security.verify("ownerPlus");
+    this.security.verify(this, "ownerPlus");
     return this.getProperty("AvailableSpace");
   }
 
 
   async GetTotalSpace() {
-    this.security.verify("ownerPlus");
+    this.security.verify(this, "ownerPlus");
     return this.getProperty("TotalSpace");
   }
 
 
   async GetLastUpdateTime() {
-    this.security.verify("ownerPlus");
+    this.security.verify(this, "ownerPlus");
     return this.getProperty("LastUpdateTime");
   }
 
   async GetProperties() {
-    this.security.verify("ownerPlus");
+    this.security.verify(this, "ownerPlus");
 
     return {
       Id : this.getId(),

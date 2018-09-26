@@ -81,7 +81,7 @@ class Api {
     let result = [];
     if (objs) {
       for (let i = 0; i < objs.length; ++i) {
-        result.push(Api.create(objs[i].Path, this.request, this.response, objs[i]));
+        result.push(await Api.create(objs[i].Path, this.request, this.response, objs[i]));
       }
     }
     return result;
@@ -109,7 +109,7 @@ class Api {
     let lastDelim = this.path.lastIndexOf("/");
     let parentPath = this.path.substr(0, lastDelim);
 
-    let parent = Api.create(parentPath, this.request, this.response);
+    let parent = await Api.create(parentPath, this.request, this.response);
     return parent.deleteChild(this.path);
   }
 
