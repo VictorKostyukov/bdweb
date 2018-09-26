@@ -40,12 +40,13 @@ class UserApi extends Api {
     credential.credential = this.getCredential("Password");
 
     let success = await credential.verify(password);
+    let st = this.security.getSecurityToken();
     if (success) {
       this.security.user = this;
-      this.response.cookie("st", this.security.getSecurityToken());
+      this.response.cookie("st", st);
     }
 
-    return success;
+    return st;
   }
 
 

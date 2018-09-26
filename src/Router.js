@@ -32,6 +32,9 @@ class Router {
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended : true }));
 
+    let cookieParser = require("cookie-parser");
+    this.app.use(cookieParser());
+
     let _this = this;
 
     let handler = function(method, req, res) {

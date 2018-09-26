@@ -90,6 +90,10 @@ class ApiParser {
       throw new NotSupportedException();
     }
 
+    if (!functionName || functionName === "") {
+      return [];
+    }
+
     const members = this.data[className];
     if (!(functionName in members)) {
       throw new NotSupportedException();

@@ -26,6 +26,10 @@ const UI = {
       .done(function(obj) {
         ReactDOM.render(null, document.getElementById("main"));
 
+        if (obj.Type === "Error") {
+          throw obj;
+        }
+
         let viewName = obj.Type + "View";
         let view = require("./views/" + viewName + ".jsx");
         ReactDOM.render(
@@ -126,9 +130,11 @@ const UI = {
     if (typeof(err) === "string") {
       alert(err);
     } else if (err.Type === "Error") {
-      alert(err.Message);
-      if (err.Code === 201) { // LOGIN_EXPIRED
+      if (err.Code === 201 || err.Code === 202) { // LOGIN_EXPIRED || ACCESS_DENIED
+        document.cookie = "st=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
         UI.redirect("/#/view/system/Security/Login");
+      } else {
+        alert(err.Message);
       }
     } else if (err.message) {
       alert(err.message);

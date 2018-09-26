@@ -45,10 +45,24 @@ class Security {
   }
 
 
-  // TODO: load the shared key from conf file
   static get sharedKey() {
     if (!Security._sharedKey) {
-      Security._sharedKey = crypto.randomBytes(16);
+      const fs = require("fs");
+      const dirname = __dirname + "/../../config";
+      let filename = dirname + "/SharedKey.conf";
+      try {
+        Security._sharedKey = new Buffer(fs.readFileSync(filename, "utf8"), "hex");
+      } catch(ex) {
+        Security._sharedKey = crypto.randomBytes(16);
+        const mkdirp = require("mkdirp");
+        mkdirp(dirname, function(err) {
+          try {
+            fs.writeFileSync(filename, Security._sharedKey.toString("hex"));
+          } catch (ex2) {
+            console.error(ex2);
+          }
+        })
+      }
     }
     return Security._sharedKey;
   }

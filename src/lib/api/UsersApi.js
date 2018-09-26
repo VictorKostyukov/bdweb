@@ -20,6 +20,15 @@ class UsersApi extends Api {
 
 
   async NewUser(username, password) {
+    this.security.verify(this, "adminPlus");
+    return this.newUser(username, password);
+  }
+
+
+  async newUser(username, password) {
+    this.verifyArgument("username", typeof(username) === "string" && username.length > 0);
+    this.verifyArgument("password", typeof(password) === "string" && password.length >= 8);
+
     let path = this.path + "/" + username;
     let props = {
       Username : username,

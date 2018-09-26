@@ -47,7 +47,6 @@ class SystemSecurityView extends View {
       if (formData.inputPassword !== formData.inputConfirmPassword) {
         throw Error(loc("Password does not match."));
       } else {
-        /*
         let api = new Api("system://Security");
         api.call("RegisterUser", {
           username : formData.inputUserName,
@@ -55,14 +54,6 @@ class SystemSecurityView extends View {
         }).then(result => {
           UI.redirect("/#/view/system/Home");
         });
-        */
-       let api = new Api("system://Home");
-       api.call("Test", {
-         test1 : 1,
-         test2 : "hello"
-       }).then(result => {
-        console.log(result);
-       });
       }
 
       event.preventDefault();

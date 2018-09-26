@@ -1,6 +1,8 @@
 #! /usr/bin/env node
 
-const NotSupportedException = require("./Exception.js").NotSupportedException;
+const _exceptions = require("./Exception.js");
+const NotSupportedException = _exceptions.NotSupportedException;
+const InvalidArgumentException = _exceptions.InvalidArgumentException;
 const ObjectBase = require("./Object.js").ObjectBase;
 const Security = require("./Security.js").Security;
 
@@ -109,6 +111,15 @@ class Api {
 
     let parent = Api.create(parentPath, this.request, this.response);
     return parent.deleteChild(this.path);
+  }
+
+
+  verifyArgument(name, condition) {
+    if (condition === false) {
+      throw new InvalidArgumentException(name);
+    }
+
+    return true;
   }
 
 

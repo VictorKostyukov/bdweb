@@ -2,3 +2,4 @@ node_modules
 *.swp
 .vscode
 src/public/res/js/gen
+src/config/SharedKey.conf

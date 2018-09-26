@@ -20,7 +20,10 @@ class SystemSecurityApi extends Api {
 
 
   async RegisterUser(username, password) {
-    return true;
+    this.security.verify(this, "anonymouse");
+
+    let api = await Api.create("name://Users", this.request, this.response);
+    return api.newUser(username, password);
   }
 }
 
