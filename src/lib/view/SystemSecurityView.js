@@ -7,12 +7,12 @@ class SystemSecurityView extends View {
   }
 
 
-  model() {
+  async model() {
     throw new NotSupportedException();
   }
 
 
-  SignUp() {
+  async SignUp() {
     return this.__render({
       view : {
         navigationBar : { hidden : true },
@@ -22,7 +22,7 @@ class SystemSecurityView extends View {
   }
 
 
-  Login() {
+  async Login() {
     return this.__render({
       view : {
         navigationBar : { hidden : true },

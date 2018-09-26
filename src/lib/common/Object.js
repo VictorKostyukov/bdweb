@@ -24,7 +24,7 @@ class ObjectBase {
     this._path = path;
   }
 
-  async init() {
+  async init(obj) {
     return this;
   }
 
@@ -222,9 +222,11 @@ class DbObject extends ObjectBase {
     return this._collection;
   }
 
-  async init() {
-    let colobj = new DbCollectionObject("name://" + this.colname);
-    let obj = await colobj.getChild(this._path);
+  async init(obj) {
+    if (!obj) {
+      let colobj = new DbCollectionObject("name://" + this.colname);
+      obj = await colobj.getChild(this._path);
+    }
 
     if (!obj || !obj.Type) {
       throw new ObjectNotFoundException(this._path);

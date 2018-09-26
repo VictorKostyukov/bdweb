@@ -18,12 +18,7 @@ class View {
   }
 
 
-  async init() {
-    return true;
-  }
-
-
-  model() {
+  async model() {
     return this.__render({});
   }
 

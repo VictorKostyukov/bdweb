@@ -122,7 +122,6 @@ class Router {
 
   async __callView(path, action, args, request, response) {
     let view = await View.create(path, request, response);
-    await view.init();
 
     let func;
     if (action && action !== "") {

@@ -81,7 +81,7 @@ class Api {
     let result = [];
     if (objs) {
       for (let i = 0; i < objs.length; ++i) {
-        result.push(Api.create(objs[i].path, this.request, this.response));
+        result.push(Api.create(objs[i].Path, this.request, this.response, objs[i]));
       }
     }
     return result;
@@ -123,9 +123,9 @@ class Api {
   }
 
 
-  static async create(path, req, res) {
+  static async create(path, req, res, dbobj) {
     let obj = ObjectBase.create(path);
-    await obj.init();
+    await obj.init(dbobj);
 
     let type = obj.type + "Api";
     const apiType = require("../api/" + type + ".js")[type];

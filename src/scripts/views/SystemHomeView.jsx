@@ -10,7 +10,7 @@ class SystemHomeView extends View {
   onRender() {
     return (
       <div>
-        This is message from {this.type}: {this.model}
+        This is message from {this.model.page}: {this.model.message}
       </div>
     );
   }
