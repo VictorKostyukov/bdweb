@@ -3,9 +3,12 @@ const Resources = {
   Nav_Hosts : "HOSTS",
   Nav_Clients : "CLIENTS",
   Nav_Contracts : "CONTRACTS",
-  SR_Current : "(current)",
   Login : "Login",
-  Logout : "Logout"
+  Logout : "Logout",
+  SR_Current : "(current)",
+  TITLE_Home : "Home",
+  TITLE_SignUp : "Sign Up",
+  TITLE_SignIn : "Sign In"
 };
 
 

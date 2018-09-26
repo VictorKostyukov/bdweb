@@ -18,7 +18,7 @@ class SystemSecurityView extends View {
         navigationBar : { hidden : true },
         noContainer : true
       }
-    });
+    }, "TITLE_SignUp");
   }
 
 
@@ -28,7 +28,7 @@ class SystemSecurityView extends View {
         navigationBar : { hidden : true },
         noContainer : true
       }
-    });
+    }, "TITLE_SignIn");
   }
 }
 

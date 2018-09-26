@@ -30,7 +30,7 @@ class NavigationBar extends React.PureComponent {
   __renderLogo() {
     if (this.logo) {
       return (
-        <a class="navbar-brand" href="/" aria-label="Drive">
+        <a class="navbar-brand" href="https://www.drvcoin.io" aria-label="Drive">
           <img src={this.logo} alt="Logo" height="32"></img>
         </a>
       );

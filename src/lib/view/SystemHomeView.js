@@ -8,7 +8,8 @@ class SystemHomeView extends View {
 
 
   model() {
-    return this.__render("hello world");
+    this.api.security.verify(this.api, "userPlus");
+    return this.__render("hello world", "TITLE_Home");
   }
 }
 

@@ -30,6 +30,10 @@ const UI = {
           throw obj;
         }
 
+        if (obj.Title) {
+          document.title = obj.Title ? UI.loc(obj.Title) : UI.loc("Drive User Portal");
+        }
+
         let viewName = obj.Type + "View";
         let view = require("./views/" + viewName + ".jsx");
         ReactDOM.render(

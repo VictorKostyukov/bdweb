@@ -28,10 +28,11 @@ class View {
   }
 
 
-  __render(data) {
+  __render(data, title) {
     return {
       Path : this._api.path,
       Type : this._api.type,
+      Title : title ? title : "",
       Model : data
     };
   }
