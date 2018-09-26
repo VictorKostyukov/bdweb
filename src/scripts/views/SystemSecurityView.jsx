@@ -11,14 +11,35 @@ class SystemSecurityView extends View {
 
 
   onRenderLogin() {
+    let formData = {};
+
+    let onFormDataChange = event => {
+      const target = event.target;
+      formData[target.id] = target.value;
+    };
+
+    let onSubmit = event => {
+      if (!formData.inputUserName || !formData.inputPassword) {
+        throw Error(loc("Please enter your user name and password."));
+      } else {
+        let api = new Api("system/Security");
+        api.call("LoginPassword", {
+          username : formData.inputUserName,
+          password : formData.inputPassword
+        }).then(result => {
+          UI.redirect("/#/view/system/Home/");
+        })
+      }
+    };
+
     return (
       <div class="text-center form-login-container">
-        <form class="form-login" autoComplete="on">
+        <form class="form-login" autoComplete="on" onSubmit={onSubmit}>
           <img class="mb-5" src="/res/img/drive_logo.png" alt="" height="50"></img>
           <label for="inputUserName" class="sr-only">{ loc("Email address") }</label>
-          <input type="email" id="inputUserName" class="form-control" placeholder={loc("Email address")} required autofocus></input>
+          <input type="email" id="inputUserName" class="form-control" placeholder={loc("Email address")} onChange={onFormDataChange} required autofocus></input>
           <label for="inputPassword" class="sr-only">{ loc("Password") }</label>
-          <input type="password" id="inputPassword" class="form-control" placeholder={loc("Password")} autoComplete="off" required></input>
+          <input type="password" id="inputPassword" class="form-control" placeholder={loc("Password")} onChange={onFormDataChange} autoComplete="off" required></input>
 
           <a class="float-right mb-4" href="#">{loc("Forgot password?")}</a>
           <button class="btn btn-lg btn-primary btn-block" type="submit">{loc("Sign in")}</button>
@@ -52,7 +73,7 @@ class SystemSecurityView extends View {
           username : formData.inputUserName,
           password : formData.inputPassword
         }).then(result => {
-          UI.redirect("/#/view/system/Home");
+          UI.redirect("/#/view/system/Home/");
         });
       }
 

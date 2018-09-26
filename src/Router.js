@@ -88,15 +88,6 @@ class Router {
   }
 
 
-  static __normalizeArg(val) {
-    try {
-      return JSON.parse(val);
-    } catch (ex) {
-      return val;
-    }
-  }
-
-
   async run(port) {
     return new Promise(resolve => this.app.listen(port, resolve));
   }
@@ -115,7 +106,7 @@ class Router {
       let arglist = [];
       if (declArgs) {
         declArgs.forEach(function(name) {
-          arglist.push(Router.__normalizeArg(args[name]));
+          arglist.push(args[name]);
         });
       }
 
@@ -148,7 +139,7 @@ class Router {
     let arglist = [];
     if (declArgs) {
       declArgs.forEach(function(name) {
-        arglist.push(Router.__normalizeArg(args[name]));
+        arglist.push(args[name]);
       });
     }
 
@@ -182,10 +173,26 @@ class Router {
 
 
   static __parseArguments(req) {
+    let normalize = function(obj) {
+      let result = {};
+      for (let name in obj) {
+        try {
+          result[name] = JSON.parse(obj[name]);
+        } catch (ex) {
+          result[name] = obj[name];
+        }
+      }
+      return result;
+    };
+
     let args = Object.assign({}, req.cookies, req.query);
 
-    if (req.is("application/json") || req.is("application/x-www-form-urlencoded")) {
-      args = Object.assign(args, req.body);
+    if (req.is("application/x-www-form-urlencoded")) {
+      args = normalize(Object.assign(args, req.body));
+    } else if (req.is("application/json")) {
+      args = Object.assign(normalize(args), req.body);
+    } else {
+      args = normalize(args);
     }
 
     return args;
