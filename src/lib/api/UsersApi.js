@@ -19,7 +19,7 @@ class UsersApi extends Api {
   }
 
 
-  async NewUser({username, password}) {
+  async NewUser(username, password) {
     let path = this.path + "/" + username;
     let props = {
       Username : username,

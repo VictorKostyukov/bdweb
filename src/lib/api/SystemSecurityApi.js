@@ -19,7 +19,7 @@ class SystemSecurityApi extends Api {
   }
 
 
-  async RegisterUser({username, password}) {
+  async RegisterUser(username, password) {
     return true;
   }
 }

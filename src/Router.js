@@ -6,6 +6,7 @@ const Api = require("./lib/common/Api.js").Api;
 const View = require("./lib/common/View.js").View;
 const ObjectBase = require("./lib/common/Object.js").ObjectBase;
 const Security = require("./lib/common/Security.js").Security;
+const ApiParser = require("./lib/common/ApiParser.js").ApiParser;
 
 
 class Router {
@@ -13,10 +14,13 @@ class Router {
   constructor() {
     this.express = require("express");
     this.app = this.express();
+    this.apiParser = new ApiParser();
   }
 
 
   init() {
+    this.apiParser.init();
+
     this.app.all("/", function(request, response) {
       response.set("Content-Type", "text/html");
       response.sendFile("frame/index.html", { root : __dirname });
@@ -77,6 +81,15 @@ class Router {
   }
 
 
+  static __normalizeArg(val) {
+    try {
+      return JSON.parse(val);
+    } catch (ex) {
+      return val;
+    }
+  }
+
+
   async run(port) {
     return new Promise(resolve => this.app.listen(port, resolve));
   }
@@ -91,8 +104,15 @@ class Router {
         throw new NotSupportedException();
       }
 
-      let method = func.bind(api);
-      return await method(args);
+      let declArgs = this.apiParser.getParameterList(api.constructor.name, action);
+      let arglist = [];
+      if (declArgs) {
+        declArgs.forEach(function(name) {
+          arglist.push(Router.__normalizeArg(args[name]));
+        });
+      }
+
+      return await func.apply(api, arglist);
     } else {
       return {
         Path : api.path,
@@ -117,8 +137,15 @@ class Router {
       throw new NotSupportedException();
     }
 
-    let method = func.bind(view);
-    return method(args);
+    let declArgs = this.apiParser.getParameterList(view.constructor.name, action);
+    let arglist = [];
+    if (declArgs) {
+      declArgs.forEach(function(name) {
+        arglist.push(Router.__normalizeArg(args[name]));
+      });
+    }
+
+    return func.apply(view, arglist);
   }
 
 

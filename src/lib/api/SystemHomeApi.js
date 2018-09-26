@@ -8,7 +8,7 @@ class SystemHomeApi extends Api {
     super(obj);
   }
 
-  async Test({test1, test2}) {
+  async Test(test1, test2) {
     return {
       test1: test1,
       test2: test2

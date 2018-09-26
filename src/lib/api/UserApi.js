@@ -16,13 +16,13 @@ class UserApi extends Api {
   }
 
 
-  async SetPassword({password}) {
+  async SetPassword(password) {
     this.security.verify(this, "serverPlus");
     return this.setPassword(password);
   }
 
 
-  async ChangePassword({oldPassword, newPassword}) {
+  async ChangePassword(oldPassword, newPassword) {
     this.security.verify(this, "ownerPlus");
 
     let credential = new PasswordCredential();
@@ -35,7 +35,7 @@ class UserApi extends Api {
   }
 
 
-  async LoginPassword({password}) {
+  async LoginPassword(password) {
     let credential = new PasswordCredential();
     credential.credential = this.getCredential("Password");
 
@@ -55,7 +55,7 @@ class UserApi extends Api {
   }
 
 
-  async SetRole({role}) {
+  async SetRole(role) {
     this.security.verify({ Role : this.getProperty("Role"), NewRole : role }, "changeRole");
     return this.setProperty("Role", role);
   }
