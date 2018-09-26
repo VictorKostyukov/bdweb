@@ -28,6 +28,10 @@ class Router {
 
     this.app.use(this.express.static("public"));
 
+    let bodyParser = require("body-parser");
+    this.app.use(bodyParser.json());
+    this.app.use(bodyParser.urlencoded({ extended : true }));
+
     let _this = this;
 
     let handler = function(method, req, res) {
