@@ -84,7 +84,7 @@ class NavigationBar extends React.PureComponent {
 
   render() {
     return (
-      <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-3 bd-nav-main">
+      <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4 bd-nav-main">
         { this.__renderLogo() }
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsMain" aria-controls="navbarsMain" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>

@@ -22,7 +22,14 @@ class SystemHostView extends View {
       });
     }
 
-    return this.__render({ hosts : hostArr });
+    return this.__render({ action : "default", hosts : hostArr }, "TITLE_Hosts");
+  }
+
+
+  async Register() {
+    this.security.verify(this.api, "userPlus");
+
+    return this.__render({ action : "register" }, "TITLE_Hosts_Register");
   }
 }
 

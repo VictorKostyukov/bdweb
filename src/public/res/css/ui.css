@@ -67,3 +67,12 @@ div#main {
   z-index: 2;
 }
 
+.bd-badge-corner {
+  font-size: 0.3em;
+  vertical-align: top;
+}
+
+.bd-btn {
+  min-width : 75pt;
+}
+

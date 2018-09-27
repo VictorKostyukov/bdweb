@@ -4,6 +4,7 @@ const UI = {
 
   _defaultUrl : "/#/view/system/Home/",
   _locale : null,
+  _lastId : 0,
 
   location : {},
 
@@ -44,6 +45,11 @@ const UI = {
       .fail(function(jqXHR, status, err) {
         throw err;
       });
+  },
+
+
+  refresh : function() {
+    UI.render();
   },
 
 
@@ -131,17 +137,26 @@ const UI = {
   handleError : function(err) {
     console.log(err);
 
+    const showError = function(message) {
+      const _dialog = require("./controls/Dialog.jsx");
+      const MessageBoxButtons = _dialog.MessageBoxButtons;
+      const MessageBoxLevel = _dialog.MessageBoxLevel;
+      const MessageBox = _dialog.MessageBox;
+
+      MessageBox.show(UI.loc("Error"), message, MessageBoxButtons.OK, MessageBoxButtons.OK, MessageBoxLevel.Error);
+    };
+
     if (typeof(err) === "string") {
-      alert(err);
+      showError(err);
     } else if (err.Type === "Error") {
       if (err.Code === 201 || err.Code === 202) { // LOGIN_EXPIRED || ACCESS_DENIED
         UI.cookie.remove("st");
         UI.redirect("/#/view/system/Security/Login");
       } else {
-        alert(err.Message);
+        showError(err.Message);
       }
     } else if (err.message) {
-      alert(err.message);
+      showError(err.message);
     }
   },
 
@@ -168,6 +183,55 @@ const UI = {
     remove : function(name) {
       document.cookie = name + "=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
     }
+  },
+
+
+  size : {
+    toString : function(value) {
+      if (typeof(value) === "undefined" || value === null) {
+        return value;
+      }
+
+      const KB = 1024;
+      const MB = KB * 1024;
+      const GB = MB * 1024;
+      const TB = GB * 1024;
+      const PB = TB * 1024;
+
+      if (value <= 0) {
+        return 0;
+      } else if (value < KB) {
+        return value + "B";
+      } else if (value < MB) {
+        return Math.round(value / KB * 10) / 10 + "KB";
+      } else if (value < GB) {
+        return Math.round(value / MB * 10) / 10 + "MB";
+      } else if (value < TB) {
+        return Math.round(value / GB * 10) / 10 + "GB";
+      } else if (value < PB) {
+        return Math.round(value / TB * 10) / 10 + "TB";
+      } else {
+        return Math.round(value / PB * 10) / 10 + "PB";
+      }
+    }
+  },
+
+
+  timestamp : {
+    toLocaleString : function(value) {
+      if (typeof(value) === "undefined" || value === null) {
+        return value;
+      }
+
+      return new Date(value * 1000).toLocaleString();
+    }
+  },
+
+
+  nextGlobalId : function() {
+    let result = `GID${UI._lastId}`;
+    ++ UI._lastId;
+    return result;
   }
 };
 

@@ -1,8 +1,10 @@
 const Resources = {
+  Help_FindHostID : "Host ID can be found as the NAME field in the config file on your Drive host. The file is located at \"/etc/drive/bdhost.conf\" on Linux.",
   Nav_Home : "HOME",
   Nav_Hosts : "HOSTS",
   Nav_Clients : "CLIENTS",
   Nav_Contracts : "CONTRACTS",
+  Label_InputHostID : "Input the found host ID below.",
   Login : "Login",
   Logout : "Logout",
   SR_Current : "(current)",
@@ -10,6 +12,7 @@ const Resources = {
   TITLE_Contracts : "Contracts",
   TITLE_Home : "Home",
   TITLE_Hosts : "Hosts",
+  TITLE_Hosts_Register : "Register Host",
   TITLE_SignUp : "Sign Up",
   TITLE_SignIn : "Sign In"
 };
