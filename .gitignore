@@ -1,5 +1,6 @@
 node_modules
 *.swp
 .vscode
+*.code-workspace
 src/public/res/js/gen
 src/config/SharedKey.conf
