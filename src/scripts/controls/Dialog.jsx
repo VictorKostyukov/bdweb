@@ -220,7 +220,7 @@ class MessageBox extends React.PureComponent {
     if (this._primaryButtons & button) {
       buttonClass += " btn-primary";
     } else {
-      buttonClass += " btn-secondary";
+      buttonClass += " btn-outline-secondary";
     }
 
     return (

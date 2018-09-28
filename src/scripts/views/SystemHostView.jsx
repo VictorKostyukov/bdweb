@@ -17,7 +17,7 @@ class SystemHostView extends View {
 
   __renderHostTable() {
     return (
-      <table class="table table-striped mb-4">
+      <table class="table table-responsive-sm table-responsive-md table-striped mb-4">
         <thead>
           <th scope="col">{ loc("ID") }</th>
           <th scope="col">{ loc("Address") }</th>
@@ -92,14 +92,14 @@ class SystemHostView extends View {
             <p>{ loc("Help_FindHostID") }</p>
             <p>{ loc("Label_InputHostID") }</p>
             <div class="mt-5 form-group row">
-              <label for="inputHostId" class="col-sm-2 col-form-label">{loc("Host ID")}</label>
-              <input type="text" class="form-control col-sm-9" id="inputHostId" placeholder={loc("Input host ID here")} onChange={onChange}></input>
+              <label for="inputHostId" class="col-sm-3 col-form-label">{loc("Host ID")}</label>
+              <input type="text" class="form-control col-sm-8" id="inputHostId" placeholder={loc("Input host ID here")} onChange={onChange}></input>
             </div>
           </form>
         </DialogBody>
         <DialogFooter>
-          { renderButton(loc("OK"), "btn-primary", false, onOK) }
-          { renderButton(loc("Cancel"), "btn-secondary", true) }
+          { renderButton(loc("OK"), "btn-outline-secondary", false, onOK) }
+          { renderButton(loc("Cancel"), "btn-outline-secondary", true) }
         </DialogFooter>
       </Dialog>
     );
