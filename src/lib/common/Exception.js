@@ -6,6 +6,8 @@ const ERR_NOT_SUPPORTED = 3;
 const ERR_OBJECT_NOT_FOUND = 4;
 const ERR_ALREADY_EXIST = 5;
 const ERR_INVALID_OPERATION = 6;
+const ERR_OPERATION_TIMEOUT = 7;
+const ERR_INVALID_RESPONSE = 8;
 const ERR_DATABASE = 101;
 const ERR_LOGIN_EXPIRED = 201;
 const ERR_ACCESS_DENIED = 202;
@@ -73,6 +75,20 @@ class InvalidOperationException extends Exception {
 }
 
 
+class OperationTimeoutException extends Exception {
+  constructor() {
+    super("Operation timed out.", ERR_OPERATION_TIMEOUT);
+  }
+}
+
+
+class InvalidResponseException extends Exception {
+  constructor() {
+    super("Invalid response received.", ERR_INVALID_RESPONSE);
+  }
+}
+
+
 class DbException extends Exception {
   constructor(err) {
     super("Database error", ERR_DATABASE);
@@ -113,6 +129,8 @@ module.exports = {
   ObjectNotFoundException : ObjectNotFoundException,
   AlreadyExistException : AlreadyExistException,
   InvalidOperationException : InvalidOperationException,
+  OperationTimeoutException : OperationTimeoutException,
+  InvalidResponseException : InvalidResponseException,
   DbException : DbException,
   LoginExpiredException : LoginExpiredException,
   AccessDeniedException : AccessDeniedException,

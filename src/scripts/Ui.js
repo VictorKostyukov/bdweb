@@ -130,6 +130,7 @@ const UI = {
 
 
   redirect : function(url) {
+    $(".modal").modal("hide");
     window.location = url;
   },
 

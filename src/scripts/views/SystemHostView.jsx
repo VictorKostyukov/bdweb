@@ -58,18 +58,29 @@ class SystemHostView extends View {
       hostId = event.target.value;
     };
 
-    let onOK = () => {
+    let onOK = event => {
       let value = hostId.trim();
       if (value.length < 1) {
         throw Error(loc("Invalid Host ID."));
       }
 
-      let api = new Api("system://Host");
-      api.call("RegisterHost", {
-        id : value
-      }).then(result => {
+      let target = event.target;
+      target.disabled = true;
+
+      let worker = async() => {
+        let systemHost = new Api("system://Host");
+        await systemHost.call("RegisterHost", { id : value });
+
+        let host = new Api(`name://Hosts/${value}`);
+        return host.call("UpdateProperties");
+      };
+
+      worker().then(result => {
         $("#registerHostDialog").modal("hide");
         UI.refresh();
+      }).catch(ex => {
+        target.disabled = false;
+        throw ex;
       });
     };
 
@@ -101,7 +112,7 @@ class SystemHostView extends View {
         <h1 class="mb-4">{ loc("My Hosts") } <span class="badge badge-pill badge-info bd-badge-corner mt-2">{ this.model.hosts.length }</span></h1>
         { this.model.hosts && this.model.hosts.length > 0
           ? this.__renderHostTable()
-          : <div>{ loc("You do not have any registered hosts.") }</div>
+          : <p class="mb-4">{ loc("You do not have any registered hosts.") }</p>
         }
         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#registerHostDialog">{ loc("Register Host") }</button>
         { this.__renderRegisterDialog() }
