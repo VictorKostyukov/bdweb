@@ -150,7 +150,8 @@ const UI = {
     if (typeof(err) === "string") {
       showError(err);
     } else if (err.Type === "Error") {
-      if (err.Code === 201 || err.Code === 202) { // LOGIN_EXPIRED || ACCESS_DENIED
+      let st = UI.cookie.get("st");
+      if (err.Code === 201 || (err.Code === 202 && !st)) { // LOGIN_EXPIRED || ACCESS_DENIED
         UI.cookie.remove("st");
         UI.redirect("/#/view/system/Security/Login");
       } else {
