@@ -12,6 +12,16 @@ const ERR_DATABASE = 101;
 const ERR_LOGIN_EXPIRED = 201;
 const ERR_ACCESS_DENIED = 202;
 const ERR_INVALID_CREDENTIAL = 203;
+const ERR_REQUIRE_PASSWORD = 301;
+
+
+const formatMessage = function(prefix, message) {
+  if (!message) {
+    return `${prefix}.`;
+  } else {
+    return `${prefix}: ` + message;
+  }
+}
 
 
 class Exception {
@@ -32,21 +42,21 @@ class Exception {
 
 class InvalidArgumentException extends Exception {
   constructor(name) {
-    super("Invalid argument: " + name, ERR_INVALID_ARGUMENT);
+    super(formatMessage("Invalid argument", name), ERR_INVALID_ARGUMENT);
   }
 }
 
 
 class NotSupportedException extends Exception {
   constructor() {
-    super("The operation is not supported", ERR_NOT_SUPPORTED);
+    super("The operation is not supported.", ERR_NOT_SUPPORTED);
   }
 }
 
 
 class ObjectNotFoundException extends Exception {
   constructor(path) {
-    super("Object not found: " + path, ERR_OBJECT_NOT_FOUND);
+    super(formatMessage("Object not found", path), ERR_OBJECT_NOT_FOUND);
     this._path = path;
   }
 
@@ -58,7 +68,7 @@ class ObjectNotFoundException extends Exception {
 
 class AlreadyExistException extends Exception {
   constructor(path) {
-    super("Target already exists: " + path, ERR_ALREADY_EXIST);
+    super(formatMessage("Target already exists", path), ERR_ALREADY_EXIST);
     this._path = path;
   }
 
@@ -70,7 +80,7 @@ class AlreadyExistException extends Exception {
 
 class InvalidOperationException extends Exception {
   constructor(msg) {
-    super("Invalid operation: " + msg, ERR_INVALID_OPERATION);
+    super(formatMessage("Invalid operation", msg), ERR_INVALID_OPERATION);
   }
 }
 
@@ -122,6 +132,13 @@ class InvalidCredentialException extends Exception {
 }
 
 
+class RequirePasswordException extends Exception {
+  constructor() {
+    super("Password required.", ERR_REQUIRE_PASSWORD);
+  }
+}
+
+
 module.exports = {
   Exception : Exception,
   InvalidArgumentException : InvalidArgumentException,
@@ -134,5 +151,6 @@ module.exports = {
   DbException : DbException,
   LoginExpiredException : LoginExpiredException,
   AccessDeniedException : AccessDeniedException,
-  InvalidCredentialException : InvalidCredentialException
+  InvalidCredentialException : InvalidCredentialException,
+  RequirePasswordException : RequirePasswordException
 };

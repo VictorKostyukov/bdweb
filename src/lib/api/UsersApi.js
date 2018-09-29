@@ -2,6 +2,7 @@
 
 const Api = require("../common/Api.js").Api;
 const Role = require("../common/Security.js").Role;
+const Transaction = require("../common/Transaction.js").Transaction;
 
 
 class UsersApi extends Api {
@@ -29,6 +30,8 @@ class UsersApi extends Api {
     this.verifyArgument("username", typeof(username) === "string" && username.length > 0);
     this.verifyArgument("password", typeof(password) === "string" && password.length >= 8);
 
+    username = username.toLowerCase();
+
     let path = this.path + "/" + username;
     let props = {
       Username : username,
@@ -36,10 +39,22 @@ class UsersApi extends Api {
       Owner : path
     };
 
-    await this.addChild("User", path, props);
+    let api;
+    let transaction = Transaction.begin();
 
-    let api = await Api.create(path, this.request, this.response);
-    await api.setPassword(password);
+    try
+    {
+      await this.addChild("User", path, props);
+
+      api = await Api.create(path, this.request, this.response);
+      await api.setPassword(password);
+      await api.createAccount(password);
+
+      await transaction.commit();
+    } catch(ex) {
+      await transaction.abort();
+      throw ex;
+    }
 
     if (this.security.role === Role.anonymouse) {
       this.security.user = api;

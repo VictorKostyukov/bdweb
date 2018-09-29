@@ -6,6 +6,7 @@ const Config = {
   sharedKey : null,
   kademliaUrl : null,
   kademliaTimeout : 10000,
+  web3Provider : null,
 
   init : function() {
     this.__initSharedKey();
@@ -48,11 +49,18 @@ const Config = {
       if (typeof(obj.KademliaTimeout) !== "undefined") {
         this.kademliaTimeout = obj.KademliaTimeout;
       }
+      if (obj.Web3) {
+        this.web3Provider = obj.Web3;
+      }
     } catch (ex) {
     }
 
     if (!this.kademliaUrl) {
       this.kademliaUrl = "http://dev.owtware.com:7800";
+    }
+
+    if (!this.web3Provider) {
+      this.web3Provider = "http://180.167.212.6:8545";
     }
   }
 

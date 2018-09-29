@@ -234,6 +234,50 @@ const UI = {
     let result = `GID${UI._lastId}`;
     ++ UI._lastId;
     return result;
+  },
+
+
+  account : {
+    unlockInvoke : async function(action, isActionAsync, allowCancel) {
+      const UnlockAccountDialog = require("./controls/UnlockAccountDialog.jsx").UnlockAccountDialog;
+      const Api = require("./Api.js").Api;
+
+      let api = null;
+      let result;
+      while (true) {
+        try {
+          if (isActionAsync) {
+            result = await action();
+          } else {
+            result = action();
+          }
+          break;
+        } catch (ex) {
+          if (ex.Type === "Error" && ex.Code === 301) { // REQUIRE_PASSWORD
+            let password = await UnlockAccountDialog.show();
+            if (password === null) {
+              if (allowCancel) {
+                return null;
+              } else {
+                throw ex;
+              }
+            } else {
+              if (!api) {
+                let systemSecurity = new Api("system://Security");
+                let user = await systemSecurity.call("GetUser");
+                api = new Api(user.Path);
+              }
+
+              await api.call("UnlockAccount", { password, password });
+            }
+          } else {
+            throw ex;
+          }
+        }
+      }
+
+      return result;
+    }
   }
 };
 

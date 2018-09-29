@@ -31,7 +31,7 @@ class SystemSecurityApi extends Api {
     this.verifyArgument("username", typeof(username) === "string" && username.length > 0);
     this.verifyArgument("password", typeof(password) === "string" && password.length > 0);
 
-    let api = await Api.create(`name://Users/${username}`, this.request, this.response);
+    let api = await Api.create(`name://Users/${username.toLowerCase()}`, this.request, this.response);
     return api.LoginPassword(password);
   }
 }

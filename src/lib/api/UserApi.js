@@ -5,6 +5,11 @@ const PasswordCredential = require("../common/Credential.js").PasswordCredential
 const _exceptions = require("../common/Exception.js");
 const InvalidArgumentException = _exceptions.InvalidArgumentException;
 const InvalidCredentialException = _exceptions.InvalidCredentialException;
+const AlreadyExistException = _exceptions.AlreadyExistException;
+const RequirePasswordException = _exceptions.RequirePasswordException;
+const InvalidOperationException = _exceptions.InvalidOperationException;
+const web3 = require("../common/Ethereum.js").ethereum.web3;
+const Cache = require("../common/Cache.js");
 
 class UserApi extends Api {
   constructor(obj) {
@@ -67,6 +72,50 @@ class UserApi extends Api {
   }
 
 
+  async GetAccount() {
+    this.security.verify(this, "ownerPlus");
+    return this.getProperty("Account");
+  }
+
+
+  async CreateAccount(password) {
+    this.security.verify(this, "owner");
+
+    if (this.hasProperty("Account")) {
+      throw new AlreadyExistException();
+    }
+
+    return await this.createAccount(password);
+  }
+
+
+  async UnlockAccount(password, duration) {
+    this.security.verify(this, "owner");
+
+    if (!this.hasProperty("Account")) {
+      throw new InvalidOperationException("No account is associated with this user.");
+    }
+
+    if (!duration || duration < 0) {
+      duration = 300;
+    }
+
+    let name = this.path.substr(this.path.lastIndexOf("/") + 1);
+    Cache.putSecure(`user:unlock:${name}`, password, duration);
+    return true;
+  }
+
+
+  async GetBalance() {
+    this.security.verify(this, "owner");
+
+    await this.assertAccountUnlocked();
+
+    return web3.eth.getBalance(this.getProperty("Account"));
+  }
+
+
+
   async setPassword(password) {
     if (!password || password.length < 8) {
       throw new InvalidArgumentException("password");
@@ -115,6 +164,37 @@ class UserApi extends Api {
     }
 
     return null;
+  }
+
+
+  async createAccount(password) {
+    let address = await web3.eth.personal.newAccount(password);
+    await this.setProperty("Account", address);
+
+    return address;
+  }
+
+
+  async assertAccountUnlocked() {
+    let address = this.getProperty("Account");
+    if (!address) {
+      throw new InvalidOperationException("No account is associated with this user.");
+    }
+
+    let name = this.path.substr(this.path.lastIndexOf("/") + 1);
+    let password = Cache.getSecure(`user:unlock:${name}`);
+    if (password === null) {
+      throw new RequirePasswordException();
+    }
+
+    try {
+      await web3.eth.personal.unlockAccount(address, password);
+    } catch (ex) {
+      console.error("Failed to unlock account for " + name + ": " + ex);
+      throw new RequirePasswordException();
+    }
+
+    return true;
   }
 }
 

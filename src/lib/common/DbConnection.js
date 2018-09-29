@@ -23,6 +23,11 @@ class DbConnection {
     return this._name;
   }
 
+
+  get client() {
+    return this._client;
+  }
+
   
   async init(name) {
     const url = "mongodb://localhost:27017";
