@@ -86,7 +86,7 @@ class SystemHostView extends View {
 
     return (
       <Dialog id="registerHostDialog">
-        <DialogHeader showCloseButton="true" title={loc("Register Host")} />
+        <DialogHeader title={loc("Register Host")} />
         <DialogBody>
           <form class="p-3">
             <p>{ loc("Help_FindHostID") }</p>

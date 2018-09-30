@@ -1,6 +1,6 @@
 #! /usr/bin/env node
 
-const Web3 = require("web3");
+const Web3 = require("web3-cmt");
 const Config = require("./Config.js").Config;
 
 
@@ -11,7 +11,7 @@ class Ethereum {
 
 
   init() {
-    this._web3.setProvider(Config.web3Provider);
+    this._web3.setProvider(new this._web3.providers.HttpProvider(Config.web3Provider));
   }
 
   get web3() {

@@ -8,6 +8,7 @@ class DialogHeader extends React.PureComponent {
 
     this._bg = this.props.bg ? this.props.bg : "bg-secondary";
     this._fg = this.props.fg ? this.props.fg : "text-white";
+    this._showCloseButton = typeof(this.props.showCloseButton) !== "undefined" ? this.props.showCloseButton : true;
   }
 
   __renderDefault() {
@@ -15,7 +16,7 @@ class DialogHeader extends React.PureComponent {
       <div class={`modal-header ${this._fg} ${this._bg}`}>
         <h5 class="modal-title font-weight-bold">{ this.props.title }</h5>
         {
-          this.props.showCloseButton
+          this._showCloseButton
           ? (
             <button type="button" class={`close ${this._fg}`} data-dismiss="modal" aria-label={loc("Close")}>
               <span aria-hidden="true">&times;</span>
@@ -86,6 +87,13 @@ class Dialog extends React.PureComponent {
       this._id = UI.nextGlobalId();
     }
 
+    this._size = "";
+    if (this.props.size === "lg") {
+      this._size = "modal-lg";
+    } else if (this.props.size === "sm") {
+      this._size = "modal-sm";
+    }
+
     let idSelector = `#${this._id}`;
 
     $(document).off("show.bs.modal");
@@ -117,9 +125,10 @@ class Dialog extends React.PureComponent {
 
 
   render() {
+    let cls = `modal-dialog modal-dialog-centered ${this._size}`;
     return (
       <div class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" id={this._id}>
-        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class={cls} role="document">
           <div class="modal-content">
             {this.props.children}
           </div>
@@ -254,7 +263,7 @@ class MessageBox extends React.PureComponent {
 
     return (
       <Dialog id={this._id} onHidden={onHidden}>
-        <DialogHeader showCloseButton="true" title={this.props.title} fg="text-white" bg={bg}></DialogHeader>
+        <DialogHeader title={this.props.title} fg="text-white" bg={bg}></DialogHeader>
         <DialogBody>
           <div class="py-5">
             { this.props.message }

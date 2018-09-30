@@ -74,7 +74,7 @@ class UserApi extends Api {
 
   async GetAccount() {
     this.security.verify(this, "ownerPlus");
-    return this.getProperty("Account");
+    return this.getAccount();
   }
 
 
@@ -97,7 +97,7 @@ class UserApi extends Api {
     }
 
     if (!duration || duration < 0) {
-      duration = 300;
+      duration = 300 * 1000;
     }
 
     let name = this.path.substr(this.path.lastIndexOf("/") + 1);
@@ -111,7 +111,7 @@ class UserApi extends Api {
 
     await this.assertAccountUnlocked();
 
-    return web3.eth.getBalance(this.getProperty("Account"));
+    return web3.eth.getBalance(this.getAccount());
   }
 
 
@@ -175,8 +175,13 @@ class UserApi extends Api {
   }
 
 
+  getAccount() {
+    return this.getProperty("Account");
+  }
+
+
   async assertAccountUnlocked() {
-    let address = this.getProperty("Account");
+    let address = this.getAccount();
     if (!address) {
       throw new InvalidOperationException("No account is associated with this user.");
     }

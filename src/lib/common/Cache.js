@@ -83,7 +83,7 @@ class Cache {
     let decrypted = decipher.update(encrypted);
     decrypted = Buffer.concat([decrypted, decipher.final()]);
 
-    return decrypted.toString();
+    return JSON.parse(decrypted.toString());
   }
 }
 

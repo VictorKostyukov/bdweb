@@ -73,6 +73,10 @@ div#main {
 }
 
 .bd-btn {
-  min-width : 75pt;
+  min-width: 75pt;
+}
+
+.bd-btn>i {
+  font-size:1.1em;
 }
 

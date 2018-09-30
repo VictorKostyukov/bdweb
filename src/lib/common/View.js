@@ -17,13 +17,34 @@ class View {
     return this.api.security;
   }
 
+  get request() {
+    return this.api.request;
+  }
+
+  get response() {
+    return this.api.response;
+  }
+
 
   async model() {
     return this.__render({});
   }
 
 
-  __render(data, title) {
+  __render(data, title, nav) {
+    if (nav) {
+      if (!data) {
+        data = {};
+      }
+      if (!data.view) {
+        data.view = {};
+      }
+      if (!data.view.navigationBar) {
+        data.view.navigationBar = {};
+      }
+
+      data.view.navigationBar.current = nav;
+    }
     return {
       Path : this._api.path,
       Type : this._api.type,

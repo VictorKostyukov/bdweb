@@ -17,13 +17,14 @@ class SystemHomeView extends View {
     }
 
     try {
-      let user = Api.create(this.security.user.path);
+      let user = await Api.create(this.security.user.path, this.request, this.response);
+      result.account = user.getAccount();
       let balance = await user.GetBalance();
       result.balance = balance;
     } catch (ex) {
     }
 
-    return this.__render(result, "TITLE_Home");
+    return this.__render(result, "TITLE_Home", "Home");
   }
 }
 

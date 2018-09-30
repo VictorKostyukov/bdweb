@@ -46,8 +46,8 @@ class UnlockAccountDialog extends React.PureComponent {
     };
 
     return(
-      <Dialog key={this._id} id={this._id} onHidden={onHidden}>
-        <DialogHeader showCloseButton="true" title={ loc("Unlock Account") } />
+      <Dialog id={this._id} onHidden={onHidden}>
+        <DialogHeader title={ loc("Unlock Account") } />
         <DialogBody>
           <form class="p-3">
             <p>{ loc("Input password to unlock your account for further operations.") }</p>
@@ -66,7 +66,7 @@ class UnlockAccountDialog extends React.PureComponent {
   static async show() {
     let worker = async () => new Promise((resolve, reject) => {
       Dialog.show(
-        <UnlockAccountDialog onClose={resolve} />
+        <UnlockAccountDialog key={UI.nextGlobalId()} onClose={resolve} />
       );
     });
 
