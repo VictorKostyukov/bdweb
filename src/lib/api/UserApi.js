@@ -111,7 +111,7 @@ class UserApi extends Api {
 
     await this.assertAccountUnlocked();
 
-    return web3.eth.getBalance(this.getAccount());
+    return web3.cmt.getBalance(this.getAccount());
   }
 
 
@@ -168,7 +168,7 @@ class UserApi extends Api {
 
 
   async createAccount(password) {
-    let address = await web3.eth.personal.newAccount(password);
+    let address = await web3.personal.newAccount(password);
     await this.setProperty("Account", address);
 
     return address;
@@ -193,7 +193,7 @@ class UserApi extends Api {
     }
 
     try {
-      await web3.eth.personal.unlockAccount(address, password);
+      await web3.personal.unlockAccount(address, password);
     } catch (ex) {
       console.error("Failed to unlock account for " + name + ": " + ex);
       throw new RequirePasswordException();

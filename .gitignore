@@ -4,3 +4,4 @@ node_modules
 *.code-workspace
 src/public/res/js/gen
 src/config/SharedKey.conf
+package-lock.json
