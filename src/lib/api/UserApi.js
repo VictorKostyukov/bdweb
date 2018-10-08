@@ -111,7 +111,7 @@ class UserApi extends Api {
 
     await this.assertAccountUnlocked();
 
-    return web3.cmt.getBalance(this.getAccount());
+    return web3.fromWei(web3.cmt.getBalance(this.getAccount()));
   }
 
 
@@ -193,7 +193,7 @@ class UserApi extends Api {
     }
 
     try {
-      await web3.personal.unlockAccount(address, password);
+//      await web3.personal.unlockAccount(address, password);
     } catch (ex) {
       console.error("Failed to unlock account for " + name + ": " + ex);
       throw new RequirePasswordException();

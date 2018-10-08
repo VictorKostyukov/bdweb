@@ -284,6 +284,13 @@ const UI = {
 
 UI.init();
 
+String.prototype.format = function() {
+  var a = arguments;
+  return this.replace(/{(\d+)}/g, function(m, n) {
+    return typeof a[n] != 'undefined' ? a[n] : m;
+  });
+};
+
 module.exports = {
   UI : UI
 };

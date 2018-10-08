@@ -80,3 +80,6 @@ div#main {
   font-size:1.1em;
 }
 
+table.align-middle td {
+  vertical-align: middle;
+}

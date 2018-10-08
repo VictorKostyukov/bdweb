@@ -221,7 +221,7 @@ class MessageBox extends React.PureComponent {
     }
 
     let onClick = e => {
-      this._result = e.target.value;
+      this._result = parseInt(e.target.value);
       $(`#${this._id}`).modal("hide");
     };
 

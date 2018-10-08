@@ -129,7 +129,7 @@ class SystemHomeView extends View {
       <div class="container-fluid">
         <h1 class="mb-4">{ loc("My Wallet") }</h1>
         <div class="row align-items-center">
-          <span class="col-2 mb-3 font-weight-bold">{ loc("Balance") }</span>
+          <span class="col-2 mb-3 font-weight-bold">{ loc("Balance (CMT)") }</span>
           { this.__renderBalance() }
           <div class="col-sm-6 col-md-2"></div>
           { this.__renderActions() }

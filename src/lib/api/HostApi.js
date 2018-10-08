@@ -69,6 +69,24 @@ class HostApi extends Api {
   }
 
 
+  async DownloadConfig() {
+    this.security.verify(this, "ownerPlus");
+
+    let output = await this.getConfigContent();
+    this.response.__customOutput = true;
+    this.response.setHeader("Content-disposition", "attachment; filename=bdhost.conf");
+    this.response.setHeader("Content-type", "text/plain");
+    this.response.send(output);
+  }
+
+
+  async Delete() {
+    this.security.verify(this, "ownerPlus");
+
+    return this.delete();
+  }
+
+
   getId() {
     return this.path.substr(this.path.lastIndexOf("/") + 1);
   }
@@ -153,6 +171,34 @@ class HostApi extends Api {
     }
 
     return this.setSpace(result.AvailableSize, result.TotalSize);
+  }
+
+
+  async getConfigContent() {
+    let name = this.path.substr(this.path.lastIndexOf("/") + 1);
+    let output = `NAME=${name}\n`;
+
+    let endpoint = this.getProperty("Address");
+    output += `ENDPOINT=${endpoint}\n`;
+
+    const url = require("url");
+    let port = url.parse(endpoint).port;
+    if (!port) {
+      port = "80";
+    }
+    output += `PORT=${port}\n`;
+
+    output += `KADEMLIA=${Config.kademliaUrl}\n`;
+
+    let size = this.getProperty("TotalSpace");
+    output += `SIZE=${size}\n`;
+
+    let owner = await Api.create(this.getProperty("Owner"), this.request, this.response);
+    let account = await owner.getAccount();
+
+    output += `ACCOUNT=${account}\n`;
+
+    return output;
   }
 }
 

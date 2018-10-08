@@ -6,6 +6,8 @@ const Dialog = _dialog.Dialog;
 const DialogHeader = _dialog.DialogHeader;
 const DialogBody = _dialog.DialogBody;
 const DialogFooter = _dialog.DialogFooter;
+const MessageBox = _dialog.MessageBox;
+const MessageBoxButtons = _dialog.MessageBoxButtons;
 const Api = require("../Api.js").Api;
 
 
@@ -16,14 +18,27 @@ class SystemHostView extends View {
 
 
   __renderHostTable() {
+    let onDelete = function(hostId) {
+      MessageBox.show(loc("Confirmation"), loc("Host_Delete_Confirm").format(hostId),
+        MessageBoxButtons.Yes | MessageBoxButtons.No, MessageBox.No, 2,
+        function(evt, result) {
+          if (result === MessageBoxButtons.Yes) {
+            let host = new Api(`name://Hosts/${hostId}`);
+            host.call("Delete").then(() => UI.refresh());
+          }
+        }
+      );
+    };
+
     return (
-      <table class="table table-responsive-sm table-responsive-md table-striped mb-4">
+      <table class="table table-responsive-sm table-responsive-md table-striped align-middle mb-4">
         <thead>
           <th scope="col">{ loc("ID") }</th>
           <th scope="col">{ loc("Address") }</th>
           <th scope="col">{ loc("Available Space") }</th>
           <th scope="col">{ loc("Total Space") }</th>
           <th scope="col">{ loc("Last Updated Time") }</th>
+          <th scope="col"></th>
         </thead>
         <tbody>
           {
@@ -34,6 +49,14 @@ class SystemHostView extends View {
                 <td>{ UI.size.toString(host.Properties.AvailableSpace) }</td>
                 <td>{ UI.size.toString(host.Properties.TotalSpace) }</td>
                 <td>{ UI.timestamp.toLocaleString(host.Properties.LastUpdateTime) }</td>
+                <td>
+                  <a class="btn btn-outline-dark mr-1" href={`/api/name/Hosts/${host.Properties.Id}/DownloadConfig`}>
+                    <i class="fa fa-download"></i>
+                  </a>
+                  <button type="button" class="btn btn-outline-dark" onClick={e => onDelete(host.Properties.Id)}>
+                    <i class="fa fa-trash-o"></i>
+                  </button>
+                </td>
               </tr>
             ))
           }
@@ -77,7 +100,16 @@ class SystemHostView extends View {
 
       worker().then(result => {
         $("#registerHostDialog").modal("hide");
-        UI.refresh();
+        MessageBox.show(loc("Configure Host"), loc("Host_Config_Download"),
+          MessageBoxButtons.Yes | MessageBoxButtons.No, MessageBoxButtons.Yes, 0,
+          function(evt, result) {
+            if (result === MessageBoxButtons.Yes) {
+              window.open(`/api/name/Hosts/${value}/DownloadConfig`);
+            }
+
+            UI.refresh();
+          }
+        );
       }).catch(ex => {
         target.disabled = false;
         throw ex;

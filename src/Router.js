@@ -64,7 +64,9 @@ class Router {
           req.security = security;
 
           let result = await func(uri.path, uri.action, args, req, res);
-          res.json(Router.__normalizeResult(result));
+          if (!res.__customOutput) {
+            res.json(Router.__normalizeResult(result));
+          }
           return true;
         };
 
