@@ -187,15 +187,18 @@ class UserApi extends Api {
     }
 
     let name = this.path.substr(this.path.lastIndexOf("/") + 1);
-    let password = Cache.getSecure(`user:unlock:${name}`);
+    let key = `user:unlock:${name}`;
+    let password = Cache.getSecure(key);
     if (password === null) {
       throw new RequirePasswordException();
     }
 
     try {
-//      await web3.personal.unlockAccount(address, password);
+      await web3.personal.unlockAccount(address, password);
+      console.log(`Account unlocked: ${name}`);
     } catch (ex) {
       console.error("Failed to unlock account for " + name + ": " + ex);
+      Cache.del(key);
       throw new RequirePasswordException();
     }
 

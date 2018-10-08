@@ -20,7 +20,7 @@ class SystemHostView extends View {
   __renderHostTable() {
     let onDelete = function(hostId) {
       MessageBox.show(loc("Confirmation"), loc("Host_Delete_Confirm").format(hostId),
-        MessageBoxButtons.Yes | MessageBoxButtons.No, MessageBox.No, 2,
+        MessageBoxButtons.Yes | MessageBoxButtons.No, MessageBoxButtons.No, 2,
         function(evt, result) {
           if (result === MessageBoxButtons.Yes) {
             let host = new Api(`name://Hosts/${hostId}`);
@@ -28,6 +28,12 @@ class SystemHostView extends View {
           }
         }
       );
+    };
+
+
+    let onRefresh = function(hostId) {
+      let host = new Api(`name://Hosts/${hostId}`);
+      host.call("UpdateProperties").then(() => UI.refresh());
     };
 
     return (
@@ -50,6 +56,9 @@ class SystemHostView extends View {
                 <td>{ UI.size.toString(host.Properties.TotalSpace) }</td>
                 <td>{ UI.timestamp.toLocaleString(host.Properties.LastUpdateTime) }</td>
                 <td>
+                  <button type="button" class="btn btn-outline-dark mr-1" onClick={e => onRefresh(host.Properties.Id)}>
+                    <i class="fa fa-refresh"></i>
+                  </button>
                   <a class="btn btn-outline-dark mr-1" href={`/api/name/Hosts/${host.Properties.Id}/DownloadConfig`}>
                     <i class="fa fa-download"></i>
                   </a>
