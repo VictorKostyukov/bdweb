@@ -194,7 +194,10 @@ class UserApi extends Api {
     }
 
     try {
-      await web3.personal.unlockAccount(address, password);
+      // TODO: Temporary disable unlockAccount to CMT since this causes OOM exceptions.
+      //       Need to find a way to work around this issue.
+//      await web3.personal.unlockAccount(address, password);
+      Cache.putSecure(key, password, 300*1000);
       console.log(`Account unlocked: ${name}`);
     } catch (ex) {
       console.error("Failed to unlock account for " + name + ": " + ex);

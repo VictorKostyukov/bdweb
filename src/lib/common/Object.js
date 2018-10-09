@@ -191,7 +191,7 @@ class DbCollectionObject extends ObjectBase {
     let _this = this;
 
     return new Promise((resolve, reject) => {
-      dbconn.db.collection(_this._collection).remove(
+      dbconn.db.collection(_this._collection).deleteOne(
         { Path : path },
         function(err, res) { __handleDbResult(err, res, resolve, reject); }
       );

@@ -4,4 +4,5 @@ node_modules
 *.code-workspace
 src/public/res/js/gen
 src/config/SharedKey.conf
+src/config/bdweb.conf
 package-lock.json

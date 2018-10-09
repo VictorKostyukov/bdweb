@@ -115,12 +115,14 @@ class SystemHomeView extends View {
     if (typeof(this.model.balance) === "undefined") {
       return (null);
     }
-
+/*
     return (
       <div class="row mt-5">
         <button type="button" class="btn btn-link">{loc("Show details")}</button>
       </div>
     );
+*/
+    return (null);
   }
 
 

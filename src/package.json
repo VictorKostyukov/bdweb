@@ -19,5 +19,8 @@
     "babel-preset-react-app": "^3.1.2",
     "webpack": "^4.19.1",
     "webpack-cli": "^3.1.0"
+  },
+  "scripts" : {
+    "build" : "webpack --mode=development --devtool source-map"
   }
 }

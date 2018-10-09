@@ -13,6 +13,7 @@ const Config = {
     this.__initAppConfig();
 
     console.log(`kademliaUrl=${this.kademliaUrl}`);
+    console.log(`web3Provider=${this.web3Provider}`);
   },
 
 
@@ -53,10 +54,11 @@ const Config = {
         this.web3Provider = obj.Web3;
       }
     } catch (ex) {
+      console.error(ex);
     }
 
     if (!this.kademliaUrl) {
-      this.kademliaUrl = "http://dev.owtware.com:7800";
+      this.kademliaUrl = "http://18.236.152.176:7800";
     }
 
     if (!this.web3Provider) {
