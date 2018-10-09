@@ -27,7 +27,7 @@ const Config = {
       this.sharedKey = crypto.randomBytes(16);
 
       const mkdirp = require("mkdirp");
-      mkdirp(this.confDir, function(err) {
+      mkdirp(this.confDir, err => {
         try {
           fs.writeFileSync(filename, this.sharedKey.toString("hex"));
         } catch (ex2) {
@@ -54,7 +54,7 @@ const Config = {
         this.web3Provider = obj.Web3;
       }
     } catch (ex) {
-      console.error(ex);
+      console.log("bdweb.conf not found. Using default configurations.");
     }
 
     if (!this.kademliaUrl) {
