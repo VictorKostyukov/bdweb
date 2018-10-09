@@ -7,6 +7,7 @@ const Config = {
   kademliaUrl : null,
   kademliaTimeout : 10000,
   web3Provider : null,
+  port : 8080,
 
   init : function() {
     this.__initSharedKey();
@@ -14,6 +15,7 @@ const Config = {
 
     console.log(`kademliaUrl=${this.kademliaUrl}`);
     console.log(`web3Provider=${this.web3Provider}`);
+    console.log(`port=${port}`);
   },
 
 
@@ -52,6 +54,9 @@ const Config = {
       }
       if (obj.Web3) {
         this.web3Provider = obj.Web3;
+      }
+      if (obj.Port) {
+        this.port = obj.Port;
       }
     } catch (ex) {
       console.log("bdweb.conf not found. Using default configurations.");

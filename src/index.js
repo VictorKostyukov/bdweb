@@ -15,7 +15,7 @@ async function main() {
 
   ethereum.init();
 
-  return await router.run(8080);
+  return await router.run(Config.port);
 }
 
 
