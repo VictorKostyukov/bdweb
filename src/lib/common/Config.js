@@ -15,7 +15,7 @@ const Config = {
 
     console.log(`kademliaUrl=${this.kademliaUrl}`);
     console.log(`web3Provider=${this.web3Provider}`);
-    console.log(`port=${port}`);
+    console.log(`port=${this.port}`);
   },
 
 
