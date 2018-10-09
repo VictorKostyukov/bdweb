@@ -117,7 +117,7 @@ class UserApi extends Api {
 
 
   async setPassword(password) {
-    if (!password || password.length < 8) {
+    if (!password || password.length < 1) {
       throw new InvalidArgumentException("password");
     }
 
