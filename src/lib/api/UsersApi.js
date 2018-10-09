@@ -28,7 +28,7 @@ class UsersApi extends Api {
 
   async newUser(username, password) {
     this.verifyArgument("username", typeof(username) === "string" && username.length > 0);
-    this.verifyArgument("password", typeof(password) === "string" && password.length >= 8);
+    this.verifyArgument("password", typeof(password) === "string" && password.length > 0);
 
     username = username.toLowerCase();
 
