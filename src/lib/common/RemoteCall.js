@@ -8,8 +8,9 @@ const InvalidResponseException = _exception.InvalidResponseException;
 
 
 class RemoteCall {
-  constructor(url) {
+  constructor(url, args) {
     this._url = url;
+    this._args = args;
     this._timeout = 5000;
     this._relayHost = null;
     this._relayPort = 0;
@@ -21,6 +22,14 @@ class RemoteCall {
 
   set url(val) {
     this._url = val;
+  }
+
+  get args() {
+    return this._args;
+  }
+
+  set args(val) {
+    this._args = val;
   }
 
   get timeout() {
@@ -50,6 +59,11 @@ class RemoteCall {
       url : this.url,
       timeout : this.timeout
     };
+
+    if (this.args) {
+      options.method = "POST";
+      options.json = this.args;
+    }
 
     if (this.relayHost && this.relayPort) {
       options.agentClass = Agent;

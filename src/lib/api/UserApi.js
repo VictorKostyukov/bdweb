@@ -6,10 +6,10 @@ const _exceptions = require("../common/Exception.js");
 const InvalidArgumentException = _exceptions.InvalidArgumentException;
 const InvalidCredentialException = _exceptions.InvalidCredentialException;
 const AlreadyExistException = _exceptions.AlreadyExistException;
-const RequirePasswordException = _exceptions.RequirePasswordException;
 const InvalidOperationException = _exceptions.InvalidOperationException;
-const web3 = require("../common/Ethereum.js").ethereum.web3;
-const Cache = require("../common/Cache.js");
+const NotSupportedException = _exceptions.NotSupportedException;
+const Config = require("../common/Config.js").Config;
+const sc = require("../common/ContractProvider.js");
 
 class UserApi extends Api {
   constructor(obj) {
@@ -78,40 +78,44 @@ class UserApi extends Api {
   }
 
 
-  async CreateAccount(password) {
+  async CreateAccount() {
     this.security.verify(this, "owner");
 
     if (this.hasProperty("Account")) {
       throw new AlreadyExistException();
     }
 
-    return await this.createAccount(password);
-  }
-
-
-  async UnlockAccount(password, duration) {
-    this.security.verify(this, "owner");
-
-    if (!this.hasProperty("Account")) {
-      throw new InvalidOperationException("No account is associated with this user.");
-    }
-
-    if (!duration || duration < 0) {
-      duration = 300 * 1000;
-    }
-
-    let name = this.path.substr(this.path.lastIndexOf("/") + 1);
-    Cache.putSecure(`user:unlock:${name}`, password, duration);
-    return true;
+    return await this.createAccount();
   }
 
 
   async GetBalance() {
     this.security.verify(this, "owner");
 
-    await this.assertAccountUnlocked();
+    let account = this.getAccount();
+    if (!account) {
+      throw new InvalidOperationException("No wallet account is associated with this user.");
+    }
 
-    return web3.fromWei(web3.cmt.getBalance(this.getAccount()));
+    return await sc.getBalance(this.getProperty("Account"));
+  }
+
+
+  async IssueTestTokens() {
+    this.security.verify(this, "owner");
+
+    if (!this.canIssueTestTokens()) {
+      throw new NotSupportedException();
+    }
+
+    let account = this.getAccount();
+    if (!account) {
+      throw new InvalidOperationException("No wallet account is associated with this user.");
+    }
+
+    let rtn = await sc.issueTokens(account, Config.issueTestTokens);
+    this.setProperty("TestTokensIssued", true);
+    return rtn;
   }
 
 
@@ -168,10 +172,10 @@ class UserApi extends Api {
 
 
   async createAccount(password) {
-    let address = await web3.personal.newAccount(password);
-    await this.setProperty("Account", address);
+    let account = await sc.newAccount();
+    await this.setProperty("Account", account);
 
-    return address;
+    return account;
   }
 
 
@@ -180,32 +184,8 @@ class UserApi extends Api {
   }
 
 
-  async assertAccountUnlocked() {
-    let address = this.getAccount();
-    if (!address) {
-      throw new InvalidOperationException("No account is associated with this user.");
-    }
-
-    let name = this.path.substr(this.path.lastIndexOf("/") + 1);
-    let key = `user:unlock:${name}`;
-    let password = Cache.getSecure(key);
-    if (password === null) {
-      throw new RequirePasswordException();
-    }
-
-    try {
-      // TODO: Temporary disable unlockAccount to CMT since this causes OOM exceptions.
-      //       Need to find a way to work around this issue.
-//      await web3.personal.unlockAccount(address, password);
-      Cache.putSecure(key, password, 300*1000);
-      console.log(`Account unlocked: ${name}`);
-    } catch (ex) {
-      console.error("Failed to unlock account for " + name + ": " + ex);
-      Cache.del(key);
-      throw new RequirePasswordException();
-    }
-
-    return true;
+  canIssueTestTokens() {
+    return Config.issueTestTokens && !this.getProperty("TestTokensIssued");
   }
 }
 

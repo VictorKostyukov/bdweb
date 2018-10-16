@@ -13,6 +13,9 @@ const ERR_LOGIN_EXPIRED = 201;
 const ERR_ACCESS_DENIED = 202;
 const ERR_INVALID_CREDENTIAL = 203;
 const ERR_REQUIRE_PASSWORD = 301;
+const ERR_TASK_NOT_COMPLETE = 401;
+const ERR_TASK_FAILURE = 402;
+const ERR_EOS_ERROR = 501;
 
 
 const formatMessage = function(prefix, message) {
@@ -139,6 +142,32 @@ class RequirePasswordException extends Exception {
 }
 
 
+class TaskNotCompleteException extends Exception {
+  constructor() {
+    super("Task has not completed yet.", ERR_TASK_NOT_COMPLETE);
+  }
+}
+
+
+class TaskFailureException extends Exception {
+  constructor(err) {
+    super(formatMessage("Task failed", err), ERR_TASK_FAILURE);
+  }
+}
+
+
+class EOSErrorException extends Exception {
+  constructor(code, msg) {
+    super(formatMessage("EOS error", msg), ERR_EOS_ERROR);
+    this._eosCode = code;
+  }
+
+  get eosCode() {
+    return this._eosCode;
+  }
+}
+
+
 module.exports = {
   Exception : Exception,
   InvalidArgumentException : InvalidArgumentException,
@@ -152,5 +181,8 @@ module.exports = {
   LoginExpiredException : LoginExpiredException,
   AccessDeniedException : AccessDeniedException,
   InvalidCredentialException : InvalidCredentialException,
-  RequirePasswordException : RequirePasswordException
+  RequirePasswordException : RequirePasswordException,
+  TaskNotCompleteException : TaskNotCompleteException,
+  TaskFailureException : TaskFailureException,
+  EOSErrorException : EOSErrorException
 };

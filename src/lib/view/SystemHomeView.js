@@ -1,6 +1,6 @@
 const View = require("../common/View.js").View;
 const Api = require("../common/Api.js").Api;
-
+const Config = require("../common/Config.js").Config;
 
 class SystemHomeView extends View {
   constructor(api) {
@@ -19,8 +19,10 @@ class SystemHomeView extends View {
     try {
       let user = await Api.create(this.security.user.path, this.request, this.response);
       result.account = user.getAccount();
-      let balance = await user.GetBalance();
-      result.balance = balance;
+      result.tokenSymbol = Config.tokenSymbol;
+      result.tokenPrecision = Config.tokenPrecision;
+      result.issueTestTokens = user.canIssueTestTokens();
+      result.contractTimeout = Config.contractConnectTimeout + Config.contractActionTimeout;
     } catch (ex) {
     }
 

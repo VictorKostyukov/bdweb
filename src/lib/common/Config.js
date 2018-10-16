@@ -6,15 +6,21 @@ const Config = {
   sharedKey : null,
   kademliaUrl : null,
   kademliaTimeout : 10000,
-  web3Provider : null,
   port : 8080,
+  contractProvider : null,
+  tokenSymbol : "DRV",
+  tokenPrecision : 2,
+  contractConnectTimeout : 10000,
+  contractActionTimeout : 300000,
+  issueTestTokens : 1000,
+  
 
   init : function() {
     this.__initSharedKey();
     this.__initAppConfig();
 
     console.log(`kademliaUrl=${this.kademliaUrl}`);
-    console.log(`web3Provider=${this.web3Provider}`);
+    console.log(`contractProvider=${this.contractProvider}`);
     console.log(`port=${this.port}`);
   },
 
@@ -52,11 +58,26 @@ const Config = {
       if (typeof(obj.KademliaTimeout) !== "undefined") {
         this.kademliaTimeout = obj.KademliaTimeout;
       }
-      if (obj.Web3) {
-        this.web3Provider = obj.Web3;
+      if (obj.ContractProvider) {
+        this.contractProvider = obj.ContractProvider;
       }
       if (obj.Port) {
         this.port = obj.Port;
+      }
+      if (obj.TokenSymbol) {
+        this.tokenSymbol = obj.TokenSymbol;
+      }
+      if (typeof(obj.TokenPrecision) !== "undefined") {
+        this.tokenPrecision = obj.TokenPrecision;
+      }
+      if (typeof(obj.ContractConnectTimeout) !== "undefined") {
+        this.contractConnectTimeout = obj.ContractConnectTimeout;
+      }
+      if (typeof(obj.ContractActionTimeout) !== "undefined") {
+        this.contractActionTimeout = obj.ContractActionTimeout;
+      }
+      if (typeof(obj.IssueTestTokens) !== "undefined") {
+        this.issueTestTokens = obj.IssueTestTokens;
       }
     } catch (ex) {
       console.log("bdweb.conf not found. Using default configurations.");
@@ -66,8 +87,8 @@ const Config = {
       this.kademliaUrl = "http://18.236.152.176:7800";
     }
 
-    if (!this.web3Provider) {
-      this.web3Provider = "http://180.167.212.6:8545";
+    if (!this.contractProvider) {
+      this.contractProvider = "http://180.167.212.6:7810";
     }
   }
 

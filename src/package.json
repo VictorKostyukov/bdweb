@@ -8,8 +8,7 @@
     "mkdirp": "^0.5.1",
     "mongodb": "^3.1.4",
     "request": "^2.88.0",
-    "socks5-http-client": "^1.0.4",
-    "web3-cmt": "^0.0.2-rc.5"
+    "socks5-http-client": "^1.0.4"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

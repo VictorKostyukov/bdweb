@@ -29,14 +29,15 @@ class Api {
   }
 
 
-  async call(action, args) {
+  async call(action, args, timeout) {
     let url = this.baseUrl + "/" + (action ? action : "");
 
     return new Promise((resolve, reject) => {
       $.ajax(url, {
         data : JSON.stringify(args ? args : {}),
         contentType : "application/json",
-        type : "POST"
+        type : "POST",
+        timeout : timeout
       }).done(function(data) {
         if (data.Type === "Error") {
           console.error(data);
