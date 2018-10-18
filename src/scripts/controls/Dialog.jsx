@@ -97,10 +97,10 @@ class Dialog extends React.PureComponent {
 
     let idSelector = `#${this._id}`;
 
-    $(document).off("show.bs.modal");
-    $(document).off("shown.bs.modal");
-    $(document).off("hide.bs.modal");
-    $(document).off("hidden.bs.modal");
+    $(document).off("show.bs.modal", idSelector);
+    $(document).off("shown.bs.modal", idSelector);
+    $(document).off("hide.bs.modal", idSelector);
+    $(document).off("hidden.bs.modal", idSelector);
 
     if (this.props.onShow) {
       $(document).on("show.bs.modal", idSelector, this.props.onShow);
@@ -126,7 +126,7 @@ class Dialog extends React.PureComponent {
 
 
   static tansitionDuration() {
-    return 5000;
+    return 500;
   }
 
 
