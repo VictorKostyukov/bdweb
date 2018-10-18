@@ -27,6 +27,12 @@ class SystemSecurityApi extends Api {
   }
 
 
+  async CreateAccount(password) {
+    let api = await Api.create(this.security.user.path, this.request, this.response);
+    return api.CreateAccount(password);
+  }
+
+
   async LoginPassword(username, password) {
     this.verifyArgument("username", typeof(username) === "string" && username.length > 0);
     this.verifyArgument("password", typeof(password) === "string" && password.length > 0);

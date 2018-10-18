@@ -49,7 +49,6 @@ class UsersApi extends Api {
 
       api = await Api.create(path, this.request, this.response);
       await api.setPassword(password);
-      await api.createAccount();
 
       await transaction.commit();
     } catch(ex) {

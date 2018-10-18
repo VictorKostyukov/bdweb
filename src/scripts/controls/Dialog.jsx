@@ -11,6 +11,7 @@ class DialogHeader extends React.PureComponent {
     this._showCloseButton = typeof(this.props.showCloseButton) !== "undefined" ? this.props.showCloseButton : true;
   }
 
+ 
   __renderDefault() {
     return (
       <div class={`modal-header ${this._fg} ${this._bg}`}>
@@ -124,10 +125,16 @@ class Dialog extends React.PureComponent {
   }
 
 
+  static tansitionDuration() {
+    return 5000;
+  }
+
+
   render() {
     let cls = `modal-dialog modal-dialog-centered ${this._size}`;
+    let clsModal = `modal ${this.props.disableFade ? "" : "fade"}`
     return (
-      <div class="modal fade" tabindex="-1" role="dialog" data-backdrop="static" id={this._id}>
+      <div class={clsModal} tabindex="-1" role="dialog" data-backdrop="static" id={this._id}>
         <div class={cls} role="document">
           <div class="modal-content">
             {this.props.children}
@@ -289,6 +296,71 @@ class MessageBox extends React.PureComponent {
 }
 
 
+class ProgressDialog extends React.PureComponent {
+  constructor(props) {
+    super(props);
+    this._id = this.props.id;
+    if (!this._id) {
+      this._id = UI.nextGlobalId();
+    }
+
+    this._onClose = this.props.onClose;
+  }
+
+
+  renderContent() {
+    if (!this.props.noIndicator) {
+      return (
+        <span>
+          <i class="fa fa-circle-o-notch fa-spin align-middle mr-1"></i>
+          { this.props.message }
+        </span>
+      );
+    } else {
+      return (
+        <span>
+          { this.props.message }
+        </span>
+      );
+    }
+  }
+
+
+  renderFooter() {
+    if (this.props.allowClose) {
+      return (
+        <DialogFooter>
+          <button type="button" class="btn btn-primary bd-btn" data-dismiss="modal">{ loc("Close") }</button>
+        </DialogFooter>
+      );
+    } else {
+      return (null);
+    }
+  }
+
+
+  render() {
+    let onHidden = e => {
+      if (this._onClose) {
+        this._onClose(e, this);
+      }
+    }
+
+    return (
+      <Dialog id={this._id} disableFade="true" onHidden={onHidden}>
+        <DialogHeader title={this.props.title} showCloseButton={this.props.allowClose ? true : false}></DialogHeader>
+        <DialogBody>
+          <div class="py-5">
+            { this.renderContent() }
+          </div>
+        </DialogBody>
+        { this.renderFooter() }
+      </Dialog>
+    );
+  }
+}
+
+
 module.exports = {
   Dialog : Dialog,
   DialogHeader : DialogHeader,
@@ -296,5 +368,6 @@ module.exports = {
   DialogFooter : DialogFooter,
   MessageBoxButtons : MessageBoxButtons,
   MessageBoxLevel : MessageBoxLevel,
-  MessageBox : MessageBox
+  MessageBox : MessageBox,
+  ProgressDialog : ProgressDialog
 };

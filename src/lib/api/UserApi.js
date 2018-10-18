@@ -9,6 +9,7 @@ const AlreadyExistException = _exceptions.AlreadyExistException;
 const InvalidOperationException = _exceptions.InvalidOperationException;
 const NotSupportedException = _exceptions.NotSupportedException;
 const Config = require("../common/Config.js").Config;
+const SecureString = require("../common/SecureString.js");
 const sc = require("../common/ContractProvider.js");
 
 class UserApi extends Api {
@@ -78,14 +79,14 @@ class UserApi extends Api {
   }
 
 
-  async CreateAccount() {
+  async CreateAccount(password) {
     this.security.verify(this, "owner");
 
-    if (this.hasProperty("Account")) {
+    if (this.getProperty("AccountStatus")) {
       throw new AlreadyExistException();
     }
 
-    return await this.createAccount();
+    return await this.createAccount(password);
   }
 
 
@@ -172,15 +173,41 @@ class UserApi extends Api {
 
 
   async createAccount(password) {
-    let account = await sc.newAccount();
-    await this.setProperty("Account", account);
+    await this.setProperty("AccountStatus", "creating");
 
-    return account;
+    try {
+      let accountObj = await sc.newAccount();
+      let accountPassword = new SecureString();
+      await accountPassword.setRawData(accountObj.password, password);
+
+      await this.setProperty("AccountPassword", accountPassword.toJSON());
+      await this.setProperty("Account", accountObj.name);
+      await this.setProperty("AccountStatus", "created");
+
+      return {
+        Name : accountObj.name,
+        OwnerKey : accountObj.owner
+      };
+    } catch (ex) {
+      await this.setProperty("AccountStatus", undefined);
+    }
   }
 
 
   getAccount() {
     return this.getProperty("Account");
+  }
+
+
+  getAccountPassword() {
+    let accountPassword = this.getProperty("AccountPassword");
+    if (accountPassword) {
+      let result = new SecureString();
+      result.fromJSON(accountPassword);
+      return result;
+    }
+
+    return null;
   }
 
 

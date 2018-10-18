@@ -2,11 +2,21 @@ const View = require("../View.jsx").View;
 const UI = require("../Ui.js").UI;
 const loc = UI.loc;
 const Api = require("../Api.js").Api;
+const _dlg = require("../controls/Dialog.jsx");
+const ProgressDialog = _dlg.ProgressDialog;
+const Dialog = _dlg.Dialog;
+const DialogHeader = _dlg.DialogHeader;
+const DialogBody = _dlg.DialogBody;
+const DialogFooter = _dlg.DialogFooter;
 
 
 class SystemSecurityView extends View {
   constructor(props) {
     super(props);
+
+    this.state = {
+      ownerKey : ""
+    };
   }
 
 
@@ -70,12 +80,39 @@ class SystemSecurityView extends View {
       if (formData.inputPassword !== formData.inputConfirmPassword) {
         throw Error(loc("Password does not match."));
       } else {
-        let api = new Api("system://Security");
-        api.call("RegisterUser", {
-          username : formData.inputUserName,
-          password : formData.inputPassword
-        }).then(result => {
-          UI.redirect("/#/view/system/Home/");
+        this.setState({ ownerKey : "" });
+
+        let worker = async () => {
+          let api = new Api("system://Security");
+          await api.call("RegisterUser", {
+            username : formData.inputUserName,
+            password : formData.inputPassword
+          });
+
+          let account = await api.call("CreateAccount", { password : formData.inputPassword }, this.model.eosTimeout);
+          this.setState({ ownerKey : account.OwnerKey });
+          return true;
+        };
+
+        let next = cb => {
+          window.setTimeout(cb, Dialog.tansitionDuration());
+        };
+
+        $("#dlg-signup-progress").modal("show");
+        next(() => {
+          worker().then(() => {
+            $("#dlg-signup-progress").modal("hide");
+            next(() => {
+              $("#dlg-signup-complete").off("hidden.bs.modal").on("hidden.bs.modal", () => {
+                next(() => { UI.redirect("/#/view/system/Home/"); });
+              });
+
+              $("#dlg-signup-complete").modal("show");
+            });
+          }).catch(ex => {
+            $("#dlg-signup-progress").modal("hide");
+            next(() => { UI.handleError(ex); });
+          });
         });
       }
 
@@ -83,8 +120,8 @@ class SystemSecurityView extends View {
     };
 
     return (
-      <div class="text-center form-signup-container">
-        <form class="form-signup needs-validation" autoComplete="on" onSubmit={onSubmit}>
+      <div class="form-signup-container">
+        <form class="text-center form-signup needs-validation" autoComplete="on" onSubmit={onSubmit}>
           <h3 class="mb-4">{loc("Register a new account")}</h3>
           <label class="float-left" for="inputUserName">{ loc("Email address") }</label>
           <input type="email" id="inputUserName" class="form-control" placeholder={loc("Email address")} onChange={onFormDataChange} required autofocus></input>
@@ -99,6 +136,21 @@ class SystemSecurityView extends View {
 
           <p class="mt-5 mb-3 text-muted">&copy; 2018 Drvcoin</p>
         </form>
+        <ProgressDialog id="dlg-signup-progress" title={ loc("Signing Up") } message={ loc("Dlg_Create_Account_Progress") }></ProgressDialog>
+        <Dialog id="dlg-signup-complete" disableFade="true">
+          <DialogHeader title={ loc("Welcome") }></DialogHeader>
+          <DialogBody>
+            <p>{ loc("Dlg_SignUp_Complete_Line1") }</p>
+            <p>{ loc("Dlg_SignUp_Complete_Line2") }</p>
+            <p class="text-danger">{ loc("Dlg_SignUp_Complete_Line3") }</p>
+            <div class="w-100 d-flex justify-content-center text-light bg-info">
+              { this.state.ownerKey }
+            </div>
+          </DialogBody>
+          <DialogFooter>
+            <button type="button" class="btn btn-primary bd-btn" data-dismiss="modal">{ loc("OK") }</button>
+          </DialogFooter>
+        </Dialog>
       </div>
     );
   }
