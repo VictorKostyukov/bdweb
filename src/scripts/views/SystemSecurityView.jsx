@@ -76,13 +76,38 @@ class SystemSecurityView extends View {
       formData[target.id] = target.value;
     };
 
+    let viewState = {};
+
+    let onProgressShown = () => {
+      viewState.worker().then(ownerKey => {
+        viewState.ownerKey = ownerKey;
+        $("#dlg-signup-progress").modal("hide");
+      }).catch(ex => {
+        viewState.error = ex;
+        $("#dlg-signup-progress").modal("hide");
+      });
+    };
+
+    let onProgressHidden = () => {
+      if (!viewState.error) {
+        this.setState({ ownerKey : viewState.ownerKey });
+        $("#dlg-signup-complete").modal("show");
+      } else {
+        throw viewState.error;
+      }
+    };
+
+    let onCompleteHidden = () => {
+      UI.redirect("/#/view/system/Home/");
+    };
+
     let onSubmit = event => {
       if (formData.inputPassword !== formData.inputConfirmPassword) {
         throw Error(loc("Password does not match."));
       } else {
         this.setState({ ownerKey : "" });
 
-        let worker = async () => {
+        viewState.worker = async () => {
           let api = new Api("system://Security");
           await api.call("RegisterUser", {
             username : formData.inputUserName,
@@ -90,30 +115,10 @@ class SystemSecurityView extends View {
           });
 
           let account = await api.call("CreateAccount", { password : formData.inputPassword }, this.model.eosTimeout);
-          this.setState({ ownerKey : account.OwnerKey });
-          return true;
-        };
-
-        let next = cb => {
-          window.setTimeout(cb, Dialog.tansitionDuration());
+          return account.OwnerKey;
         };
 
         $("#dlg-signup-progress").modal("show");
-        next(() => {
-          worker().then(() => {
-            $("#dlg-signup-progress").modal("hide");
-            next(() => {
-              $("#dlg-signup-complete").off("hidden.bs.modal").on("hidden.bs.modal", () => {
-                next(() => { UI.redirect("/#/view/system/Home/"); });
-              });
-
-              $("#dlg-signup-complete").modal("show");
-            });
-          }).catch(ex => {
-            $("#dlg-signup-progress").modal("hide");
-            next(() => { UI.handleError(ex); });
-          });
-        });
       }
 
       event.preventDefault();
@@ -136,8 +141,11 @@ class SystemSecurityView extends View {
 
           <p class="mt-5 mb-3 text-muted">&copy; 2018 Drvcoin</p>
         </form>
-        <ProgressDialog id="dlg-signup-progress" title={ loc("Signing Up") } message={ loc("Dlg_Create_Account_Progress") }></ProgressDialog>
-        <Dialog id="dlg-signup-complete" disableFade="true">
+        <ProgressDialog id="dlg-signup-progress" title={ loc("Signing Up") }
+                        message={ loc("Dlg_Create_Account_Progress") }
+                        onShown={onProgressShown} onHidden={onProgressHidden}>
+        </ProgressDialog>
+        <Dialog id="dlg-signup-complete" disableFade="true" onHidden={onCompleteHidden}>
           <DialogHeader title={ loc("Welcome") }></DialogHeader>
           <DialogBody>
             <p>{ loc("Dlg_SignUp_Complete_Line1") }</p>

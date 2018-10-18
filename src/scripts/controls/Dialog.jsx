@@ -125,11 +125,6 @@ class Dialog extends React.PureComponent {
   }
 
 
-  static tansitionDuration() {
-    return 500;
-  }
-
-
   render() {
     let cls = `modal-dialog modal-dialog-centered ${this._size}`;
     let clsModal = `modal ${this.props.disableFade ? "" : "fade"}`
@@ -303,8 +298,6 @@ class ProgressDialog extends React.PureComponent {
     if (!this._id) {
       this._id = UI.nextGlobalId();
     }
-
-    this._onClose = this.props.onClose;
   }
 
 
@@ -340,14 +333,8 @@ class ProgressDialog extends React.PureComponent {
 
 
   render() {
-    let onHidden = e => {
-      if (this._onClose) {
-        this._onClose(e, this);
-      }
-    }
-
     return (
-      <Dialog id={this._id} disableFade="true" onHidden={onHidden}>
+      <Dialog id={this._id} disableFade="true" onHidden={this.props.onHidden} onShown={this.props.onShown}>
         <DialogHeader title={this.props.title} showCloseButton={this.props.allowClose ? true : false}></DialogHeader>
         <DialogBody>
           <div class="py-5">
