@@ -148,11 +148,14 @@ class SystemSecurityView extends View {
         <Dialog id="dlg-signup-complete" disableFade="true" onHidden={onCompleteHidden}>
           <DialogHeader title={ loc("Welcome") }></DialogHeader>
           <DialogBody>
+            <h4 class="mb-3">{ loc("Congratulations!") }</h4>
             <p>{ loc("Dlg_SignUp_Complete_Line1") }</p>
             <p>{ loc("Dlg_SignUp_Complete_Line2") }</p>
-            <p class="text-danger">{ loc("Dlg_SignUp_Complete_Line3") }</p>
-            <div class="w-100 d-flex justify-content-center text-light bg-info">
-              { this.state.ownerKey }
+            <p class="text-danger pb-2">{ loc("Dlg_SignUp_Complete_Line3") }</p>
+            <div class="w-100 mb-3 px-3">
+              <div class="w-100 py-1 d-flex justify-content-center bg-info">
+                <code class="text-light">{ this.state.ownerKey }</code>
+              </div>
             </div>
           </DialogBody>
           <DialogFooter>

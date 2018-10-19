@@ -302,18 +302,23 @@ class ProgressDialog extends React.PureComponent {
 
 
   renderContent() {
+    let cls = this.props.contentClass;
+    if (!cls) {
+      cls = "px-5 text-center";
+    }
+
     if (!this.props.noIndicator) {
       return (
-        <span>
+        <div class={cls}>
           <i class="fa fa-circle-o-notch fa-spin align-middle mr-1"></i>
           { this.props.message }
-        </span>
+        </div>
       );
     } else {
       return (
-        <span>
+        <div class={cls}>
           { this.props.message }
-        </span>
+        </div>
       );
     }
   }
