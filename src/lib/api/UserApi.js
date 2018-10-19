@@ -120,6 +120,34 @@ class UserApi extends Api {
   }
 
 
+  async TransferTokens(account, amount, password) {
+    this.security.verify(this, "owner");
+
+    if (!amount || amount <= 0) {
+      throw new InvalidArgumentException("amount");
+    }
+
+    let from = this.getAccount();
+    if (!account) {
+      throw new InvalidOperationException("No wallet account is associated with this user.");
+    }
+
+    let to = account;
+    if (account.startsWith("@")) {
+      let username = account.substr(1);
+      let user = await Api.create(`name://Users/${username}`, this.request, this.response);
+      to = user.getAccount();
+      if (!to) {
+        throw new InvalidOperationException("No wallet account is associated with the target user.");
+      }
+    }
+
+    let accountPassword = this.getAccountPassword();
+
+    return await sc.transferTokens(from, to, amount, accountPassword.getRawData(password));
+  }
+
+
 
   async setPassword(password) {
     if (!password || password.length < 1) {

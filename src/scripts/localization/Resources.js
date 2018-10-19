@@ -6,6 +6,7 @@ const Resources = {
   Dlg_SignUp_Complete_Line1 : "Your account has been registered successfully!",
   Dlg_SignUp_Complete_Line2 : "The following is the the private key of your wallet. It will be required to recover your wallet in case you forgot your password or want to migrate to other services later.",
   Dlg_SignUp_Complete_Line3 : "This key is not saved anywhere in the system. Please make sure you record and keep it in a safe place before proceeding.",
+  Dlg_Transfer_Tokens_Progress : "Please wait while transferring tokens. This may take a few minutes.",
   Help_FindHostID : "Host ID can be found as the NAME field in the config file on your Drive host. The file is located at \"/etc/drive/bdhost.conf\" on Linux.",
   Host_Config_Download : "Updated config file needs to be deployed at \"/etc/drive/bdhost.conf\" on the host to allow payment to this host. Do you want to download this updated config file now?",
   Host_Delete_Confirm : "Are you sure to delete the host \"{0}\"?",

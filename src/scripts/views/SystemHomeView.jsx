@@ -87,6 +87,104 @@ class SystemHomeView extends View {
   }
 
 
+  __renderTransferDialog() {
+    let formData = {};
+
+    let onFormDataChange = event => {
+      const target = event.target;
+      formData[target.id] = target.value;
+    };
+
+    let validate = () => {
+      if (!formData["inputAccount"] || formData["inputAccount"] === "") {
+        throw Error(loc("Account cannot be empty."));
+      }
+      if (formData["inputAccount"] !== formData["inputConfirmAccount"]) {
+        throw Error(loc("Accounts do not match."));
+      }
+      if (!formData["inputAmount"] || parseFloat(formData["inputAmount"].trim()) <= 0) {
+        throw Error(loc("Token amount must be greater than 0."));
+      }
+      if (!formData["inputPassword"] || formData["inputPassword"] === "") {
+        throw Error(loc("Password cannot be empty."));
+      }
+    };
+
+    let viewState = {};
+
+    let onOK = () => {
+      validate();
+      $("#dlg_transfer_progress").modal("show");
+    };
+
+    let onTransferDialogHidden = () => {
+      if (viewState.success) {
+        UI.refresh();
+      }
+    };
+
+    let onTransferProgressShown = () => {
+      let account = formData["inputAccount"].trim();
+      let amount = parseFloat(formData["inputAmount"].trim());
+      let password = formData("inputPassword").trim();
+
+      let api = new Api(this.model.user);
+      api.call("TransferTokens", { account : account, amount : amount, password : password }).then(() => {
+        viewState.success = true;
+        window.setTimeout(() => { $("#dlg_transfer_progress").modal("hide"); }, 1000);
+      }).catch(ex => {
+        viewState.error = ex;
+        $("#dlg_transfer_progress").modal("hide");
+      });
+    };
+
+    let onTransferProgressHidden = () => {
+      if (viewState.success) {
+        $("#transferDialog").modal("hide");
+      } else {
+        throw viewState.error;
+      }
+    };
+
+    return (
+      <div>
+        <Dialog id="transferDialog" onHidden={onTransferDialogHidden}>
+          <DialogHeader title={loc("Transfer")} />
+          <DialogBody>
+            <div class="container">
+              <form>
+                <div class="form-group">
+                  <label for="inputAccount">{ loc("Account to transfer to") }</label>
+                  <input type="text" class="form-control" id="inputAccount" placeholder={ loc("Account name or @username") } onChange={onFormDataChange}></input>
+                </div>
+                <div class="form-group">
+                  <label for="inputConfirmAccount">{ loc("Confirm the account to transfer to") }</label>
+                  <input type="text" class="form-control" id="inputConfirmAccount" placeholder={ loc("Account name or @username") } onChange={onFormDataChange}></input>
+                </div>
+                <div class="form-group">
+                  <label for="inputAmount">{ loc("Amount of tokens to transfer") }</label>
+                  <input type="text" class="form-control" id="inputAmount" placeholder={ loc("Token amount ({0})").format(this.model.tokenSymbol) } onChange={onFormDataChange}></input>
+                </div>
+                <div class="form-group">
+                  <label for="inputPassword">{ loc("Password") }</label>
+                  <input type="password" class="form-control" id="inputPassword" placeholder={ loc("Enter your password to authorize this transaction") } onChange={onFormDataChange}></input>
+                </div>
+              </form>
+            </div>
+          </DialogBody>
+          <DialogFooter>
+            <button type="button" class="btn btn-outline-secondary bd-btn" onClick={onOK}>{ loc("OK") }</button>
+            <button type="button" class="btn btn-outline-secondary bd-btn" data-dismiss="modal">{ loc("Cancel") }</button>
+          </DialogFooter>
+        </Dialog>
+        <ProgressDialog id="dlg_transfer_progress" title={loc("Transfer Tokens")} message={loc("Dlg_Transfer_Tokens_Progress")}
+                        onShown={onTransferProgressShown} onHidden={onTransferProgressHidden}>
+        </ProgressDialog>
+      </div>
+    );
+  }
+
+
   __renderActions() {
 /*    if (typeof(this.model.balance) === "undefined") {
       return (null);
@@ -150,35 +248,7 @@ class SystemHomeView extends View {
           </Dialog>
         </div>
         <div>
-          <Dialog id="transferDialog">
-            <DialogHeader title={loc("Transfer")} />
-            <DialogBody>
-              <div class="container">
-                <form>
-                  <div class="form-group">
-                    <label for="inputAccount">{ loc("Account to transfer to") }</label>
-                    <input type="text" class="form-control" id="inputAccount" placeholder={ loc("Account name or @username") }></input>
-                  </div>
-                  <div class="form-group">
-                    <label for="inputConfirmAccount">{ loc("Confirm the account to transfer to") }</label>
-                    <input type="text" class="form-control" id="inputConfirmAccount" placeholder={ loc("Account name or @username") }></input>
-                  </div>
-                  <div class="form-group">
-                    <label for="inputAmount">{ loc("Amount of tokens to transfer") }</label>
-                    <input type="text" class="form-control" id="inputAmount" placeholder={ loc("Token amount ({0})").format(this.model.tokenSymbol) }></input>
-                  </div>
-                  <div class="form-group">
-                    <label for="inputPassword">{ loc("Password") }</label>
-                    <input type="password" class="form-control" id="inputPassword" placeholder={ loc("Enter your password to authorize this transaction") }></input>
-                  </div>
-                </form>
-              </div>
-            </DialogBody>
-            <DialogFooter>
-              <button type="button" class="btn btn-outline-secondary bd-btn">{ loc("OK") }</button>
-              <button type="button" class="btn btn-outline-secondary bd-btn" data-dismiss="modal">{ loc("Cancel") }</button>
-            </DialogFooter>
-          </Dialog>
+          { this.__renderTransferDialog() }
         </div>
       </div>
     );

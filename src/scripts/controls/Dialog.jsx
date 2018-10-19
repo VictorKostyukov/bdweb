@@ -114,6 +114,20 @@ class Dialog extends React.PureComponent {
       $(document).on("hide.bs.modal", idSelector, this.props.onHide);
     }
 
+    $(document).on("hidden.bs.modal", idSelector, e => {
+      try {
+        if (this.props.onHidden) {
+          this.props.onHidden(e);
+        }
+      } finally {
+        if (e.target) {
+          $(e.target)
+            .find("input,textarea,select").val("").end()
+            .find("input[type=checkbox],input[type=radio]").prop("checked", "").end();
+        }
+      }
+    });
+
     if (this.props.onHidden) {
       $(document).on("hidden.bs.modal", idSelector, this.props.onHidden)
     }

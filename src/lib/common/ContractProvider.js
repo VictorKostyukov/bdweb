@@ -24,8 +24,8 @@ class ContractProvider {
   }
 
 
-  async transferTokens(from, to, amount) {
-    return await this.__call("/api/eos/Account/TransferTokens", { from : from, to : to, amount : amount });
+  async transferTokens(from, to, amount, password) {
+    return await this.__call("/api/eos/Account/TransferTokens", { from : from, to : to, amount : amount, password : password });
   }
 
 
