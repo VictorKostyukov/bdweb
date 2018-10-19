@@ -9,6 +9,7 @@ const DialogBody = _dialog.DialogBody;
 const DialogFooter = _dialog.DialogFooter;
 const MessageBox = _dialog.MessageBox;
 const MessageBoxButtons = _dialog.MessageBoxButtons;
+const ProgressDialog = _dialog.ProgressDialog;
 
 
 class SystemHomeView extends View {
@@ -44,6 +45,43 @@ class SystemHomeView extends View {
     return (
       <div class="col-4 mb-3">
         { renderContent() }
+      </div>
+    );
+  }
+
+
+  __renderIssueButton() {
+    let result = {};
+
+    let onShownProgress = () => {
+      let api = new Api(this.model.user);
+      api.call("IssueTestTokens", null, this.model.contractTimeout).then(() => {
+        window.setTimeout(() => { $("#dlg-issue-progress").modal("hide"); }, 1000);
+      }).catch(ex => {
+        result.error = ex;
+        $("#dlg-issue-progress").modal("hide");
+      });
+
+    };
+
+    let onHiddenProgress = () => {
+      if (result.error) {
+        throw result.error;
+      }
+
+      UI.refresh();
+    };
+
+    return (
+      <div>
+        <button type="button" class={`btn btn-link ${this.model.issueTestTokens ? "visible" : "invisible"}`}
+                data-toggle="modal" data-target="#dlg-issue-progress">
+          { loc("Click here to obtain {0} {1} for test.").format(this.model.issueTestTokenLimit, this.model.tokenSymbol) }
+        </button>
+        <ProgressDialog id="dlg-issue-progress" title={ loc("Issue Tokens") }
+                        message={ loc("Dlg_Issue_Tokens_Progress") }
+                        onShown={onShownProgress} onHidden={onHiddenProgress}>
+        </ProgressDialog>
       </div>
     );
   }
@@ -127,7 +165,7 @@ class SystemHomeView extends View {
                   </div>
                   <div class="form-group">
                     <label for="inputAmount">{ loc("Amount of tokens to transfer") }</label>
-                    <input type="text" class="form-control" id="inputAmount"></input>
+                    <input type="text" class="form-control" id="inputAmount" placeholder={ loc("Token amount ({0})").format(this.model.tokenSymbol) }></input>
                   </div>
                   <div class="form-group">
                     <label for="inputPassword">{ loc("Password") }</label>
@@ -171,6 +209,9 @@ class SystemHomeView extends View {
           { this.__renderBalance() }
           <div class="col-sm-6 col-md-2"></div>
           { this.__renderActions() }
+        </div>
+        <div class="row">
+          { this.__renderIssueButton() }
         </div>
         { this.__renderShowDetails() }
       </div>

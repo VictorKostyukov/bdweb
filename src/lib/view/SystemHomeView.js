@@ -22,6 +22,9 @@ class SystemHomeView extends View {
       result.tokenSymbol = Config.tokenSymbol;
       result.tokenPrecision = Config.tokenPrecision;
       result.issueTestTokens = user.canIssueTestTokens();
+      if (result.issueTestTokens) {
+        result.issueTestTokenLimit = Config.issueTestTokens;
+      }
       result.contractTimeout = Config.contractConnectTimeout + Config.contractActionTimeout;
     } catch (ex) {
     }
