@@ -142,8 +142,14 @@ class UserApi extends Api {
     }
 
     let accountPassword = this.getAccountPassword();
+    let rawPassword = null;
+    try {
+      rawPassword = await accountPassword.getRawData(password);
+    } catch (ex) {
+      throw new InvalidArgumentException("password");
+    }
 
-    return await sc.transferTokens(from, to, amount, await accountPassword.getRawData(password));
+    return await sc.transferTokens(from, to, amount, rawPassword);
   }
 
 
