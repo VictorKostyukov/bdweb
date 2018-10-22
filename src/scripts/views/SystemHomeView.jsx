@@ -126,7 +126,7 @@ class SystemHomeView extends View {
     let onTransferProgressShown = () => {
       let account = formData["inputAccount"].trim();
       let amount = parseFloat(formData["inputAmount"].trim());
-      let password = formData("inputPassword").trim();
+      let password = formData["inputPassword"].trim();
 
       let api = new Api(this.model.user);
       api.call("TransferTokens", { account : account, amount : amount, password : password }).then(() => {
@@ -155,11 +155,11 @@ class SystemHomeView extends View {
               <form>
                 <div class="form-group">
                   <label for="inputAccount">{ loc("Account to transfer to") }</label>
-                  <input type="text" class="form-control" id="inputAccount" placeholder={ loc("Account name or @username") } onChange={onFormDataChange}></input>
+                  <input type="text" class="form-control" id="inputAccount" placeholder={ loc("Account name or user email") } onChange={onFormDataChange}></input>
                 </div>
                 <div class="form-group">
                   <label for="inputConfirmAccount">{ loc("Confirm the account to transfer to") }</label>
-                  <input type="text" class="form-control" id="inputConfirmAccount" placeholder={ loc("Account name or @username") } onChange={onFormDataChange}></input>
+                  <input type="text" class="form-control" id="inputConfirmAccount" placeholder={ loc("Account name or user email") } onChange={onFormDataChange}></input>
                 </div>
                 <div class="form-group">
                   <label for="inputAmount">{ loc("Amount of tokens to transfer") }</label>
