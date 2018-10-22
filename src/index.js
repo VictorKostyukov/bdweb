@@ -7,7 +7,7 @@ const Router = require("./Router.js").Router;
 async function main() {
   Config.init();
 
-  await db.init("bdtest");
+  await db.init("bdweb");
   
   let router = new Router();
   router.init();
