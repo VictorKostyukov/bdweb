@@ -1,3 +1,5 @@
+#! /usr/bin/env node
+
 const View = require("../common/View.js").View;
 const NotSupportedException = require("../common/Exception.js").NotSupportedException;
 const Config = require("../common/Config.js").Config;

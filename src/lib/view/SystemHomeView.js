@@ -1,3 +1,5 @@
+#! /usr/bin/env node
+
 const View = require("../common/View.js").View;
 const Api = require("../common/Api.js").Api;
 const Config = require("../common/Config.js").Config;

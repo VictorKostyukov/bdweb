@@ -383,7 +383,7 @@ class SystemHomeView extends View {
 
   onRender() {
     return (
-      <div class="container-fluid">
+      <div>
         <h1 class="mb-4">{ loc("My Wallet") }</h1>
         <div class="row align-items-center">
           <span class="col-2 mb-3 font-weight-bold">{ loc("Balance") }</span>
