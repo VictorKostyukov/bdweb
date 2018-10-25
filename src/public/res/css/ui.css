@@ -80,6 +80,20 @@ div#main {
   font-size:1.1em;
 }
 
+.bd-btn-transparent {
+  background-color: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.bd-btn-transparent:focus {
+  box-shadow: none;
+}
+
+.bd-btn-transparent>i {
+  font-size:1.1em;
+}
+
 table.align-middle td {
   vertical-align: middle;
 }

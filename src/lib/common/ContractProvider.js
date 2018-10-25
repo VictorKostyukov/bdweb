@@ -28,6 +28,11 @@ class ContractProvider {
     return await this.__call("/api/eos/Account/TransferTokens", { from : from, to : to, amount : amount, password : password });
   }
 
+  
+  async getTransferHistory(account, pos, limit) {
+    return await this.__call("/api/eos/Account/GetTransferHistory", { account : account, pos : pos, limit : limit });
+  }
+
 
   async __call(method, args) {
     let action = new RemoteCall(`${Config.contractProvider}${method}`, args);

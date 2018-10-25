@@ -153,6 +153,22 @@ class UserApi extends Api {
   }
 
 
+  async GetTransferHistory(limit, pos) {
+    this.security.verify(this, "owner");
+
+    if (typeof(pos) === "undefined") {
+      pos = -1;
+    }
+
+    let account = this.getAccount();
+    if (!account) {
+      throw new InvalidOperationException("No wallet account is associated with this user.");
+    }
+
+    return await sc.getTransferHistory(account, pos, limit);
+  }
+
+
 
   async setPassword(password) {
     if (!password || password.length < 1) {

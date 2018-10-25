@@ -26,13 +26,15 @@ class SystemHomeView extends View {
       return await api.call("GetBalance", null, this.model.contractTimeout);
     };
 
-    getBalance()
-      .then(result => {
-        this.setState({ balance: result });
-      })
-      .catch(ex => {
-        throw ex;
-      });
+    if (typeof(this.state.balance) === "undefined") {
+      getBalance()
+        .then(result => {
+          this.setState({ balance: result });
+        })
+        .catch(ex => {
+          throw ex;
+        });
+    }
 
     let renderContent = () => {
       if (typeof(this.state.balance) !== "undefined") {
@@ -186,10 +188,9 @@ class SystemHomeView extends View {
 
 
   __renderActions() {
-/*    if (typeof(this.model.balance) === "undefined") {
+    if (typeof(this.state.balance) === "undefined") {
       return (null);
     }
-*/
 
     let onWithdraw = () => {
       MessageBox.show(loc("Withdraw"), loc("Coming soon..."), MessageBoxButtons.OK, MessageBoxButtons.OK, 0);
@@ -256,16 +257,126 @@ class SystemHomeView extends View {
 
 
   __renderShowDetails() {
-    if (typeof(this.model.balance) === "undefined") {
+    if (typeof(this.state.balance) === "undefined") {
       return (null);
     }
-/*
+
+    let expandButton;
+    if (this.state.historyExpanded) {
+      expandButton = <i class="fa fa-chevron-circle-up ml-2"></i>;
+    } else {
+      expandButton = <i class="fa fa-chevron-circle-down ml-2"></i>;
+    }
+
+    const fetchLimit = 10;
+
+    let fetchHistory = (end, limit) => {
+      let api = new Api(this.model.user);
+      api.call("GetTransferHistory", { pos : end, limit : limit }).then(result => {
+        this.setState({
+          history : this.state.history ? this.state.history.concat(result) : result,
+          historyFetching : false,
+          showMoreHistory : result.length >= limit && result[result.length - 1].Id > 0
+        });
+      }).catch(ex => {
+        this.setState({ historyFetching : false });
+      });
+    };
+
+    let onExpandClicked = () => {
+      let historyExpanded = !this.state.historyExpanded;
+      if (historyExpanded) {
+        if (!this.state.history && !this.state.historyFetching) {
+          this.setState({ historyFetching : true });
+          fetchHistory(-1, fetchLimit);
+        }
+      }
+      this.setState({ historyExpanded : historyExpanded });
+    };
+
+    let onShowMoreClicked = () => {
+      let end = -1;
+      if (this.state.history &&
+          this.state.history.length > 0 &&
+          this.state.history[this.state.history.length - 1].Id > 0) {
+        end = this.state.history[this.state.history.length - 1].Id - 1;
+      }
+
+      if (!this.state.historyFetching) {
+        this.setState({
+          historyFetching : true,
+          showMoreHistory : false
+        });
+        fetchHistory(end, fetchLimit);
+      }
+    };
+
+    let renderAccount = (from, to) => {
+      if (from === this.model.account) {
+        return (
+          <td class="align-items-center">
+            <i class="fa fa-arrow-right"></i>
+            <span class="ml-1">{to}</span>
+          </td>
+        );
+      } else {
+        return (
+          <td class="align-items-center">
+            <i class="fa fa-arrow-left"></i>
+            <span class="ml-1">{from}</span>
+          </td>
+        );
+      }
+    };
+
+    let historyEntries = this.state.history ? this.state.history : [];
+    let historyItems = historyEntries.map(entry =>
+      <tr>
+        <td>{UI.timestamp.toLocaleString(entry.Time)}</td>
+        {renderAccount(entry.From, entry.To)}
+        <td>{entry.From === this.model.account ? `-${entry.Amount}` : entry.Amount}</td>
+      </tr>
+    );
+
     return (
       <div class="row mt-5">
-        <button type="button" class="btn btn-link">{loc("Show details")}</button>
+        <div class="container">
+          <div class="row col-12 align-items-center mb-3">
+            <button type="button" class="btn bd-btn-transparent pl-0" onClick={onExpandClicked}>
+              <h4>
+                {loc("Account History")}
+                {expandButton}
+              </h4>
+            </button>
+          </div>
+          <div class="row col-12">
+            <div class={this.state.historyExpanded ? "w-100" : "collapse w-100"}>
+              <table class={`table table-striped ${this.state.history ? "" : "collapse"}`}>
+                <thead>
+                  <tr>
+                    <th scope="col" style={{width: "33%"}}>{loc("Time")}</th>
+                    <th scope="col" style={{width: "33%"}}>{loc("Account")}</th>
+                    <th scope="col" style={{width: "33%"}}>{loc("Amount")}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  { historyItems }
+                </tbody>
+              </table>
+              <div class={`mt-3 ${this.state.showMoreHistory ? "" : "collapse"}`}>
+                <button type="button" class="btn btn-link" onClick={onShowMoreClicked}>{loc("Show more history")}</button>
+              </div>
+              <div class="d-flex justify-content-center">
+                <div class={this.state.historyFetching ? "" : "collapse"}>
+                  <i class="fa fa-circle-o-notch fa-spin"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     );
-*/
+
     return (null);
   }
 
